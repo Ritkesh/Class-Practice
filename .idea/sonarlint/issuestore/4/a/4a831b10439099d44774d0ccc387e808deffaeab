@@ -1,0 +1,14 @@
+
+M
+java:S1854"7Remove this useless assignment to local variable "map".(ääš›
+S	java:S106"9Replace this use of System.out or System.err by a logger.(†Á¸ÿÿÿÿÿ
+>
+java:S1481"(Remove this unused "map" local variable.(ääš›
+S	java:S106"9Replace this use of System.out or System.err by a logger.(ıŒøíıÿÿÿÿ
+@
+java:S2116"%Use "Arrays.toString(array)" instead.(ıŒøíıÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(é¦¬ä
+;
+java:S2116"%Use "Arrays.toString(array)" instead.(é¦¬ä
+H
+java:S1128"-Remove this unused import 'java.util.Arrays'.(î–˜Éüÿÿÿÿ

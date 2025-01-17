@@ -1,0 +1,39 @@
+
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.( –é‡úÿÿÿÿ
+h
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(…´Ë
+9
+java:S1659"#Declare "right" on a separate line.(Ó®¨®
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+;
+java:S1905	"&Remove this unnecessary cast to "int".(ë»ë
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+A
+java:S1905"&Remove this unnecessary cast to "int".(ëÑÊıÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(µÁ
