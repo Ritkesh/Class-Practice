@@ -1,0 +1,20 @@
+
+\
+java:S1192"FDefine a constant instead of duplicating this literal "Ratan" 3 times.(µ¢Ğó
+A
+java:S1481"&Remove this unused "i" local variable.(ùó›Ìøÿÿÿÿ
+Q	java:S125	"<This block of commented-out lines of code should be removed.(î¯ÔÉ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(»¾ƒÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(Û¥Ïéøÿÿÿÿ
+5
+java:S2676"Use the original value instead.(¯â
+S	java:S106"9Replace this use of System.out or System.err by a logger.(ãŸíòûÿÿÿÿ
+[
+java:S1612"@Replace this lambda with method reference 'System.out::println'.(÷•–Ìşÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(÷•–Ìşÿÿÿÿ
+N	java:S106 "9Replace this use of System.out or System.err by a logger.(³Úóú
+S	java:S106$"9Replace this use of System.out or System.err by a logger.(ä›‡”ûÿÿÿÿ
+[
+java:S1612("@Replace this lambda with method reference 'System.out::println'.(½Ëõ÷øÿÿÿÿ
+S	java:S106("9Replace this use of System.out or System.err by a logger.(½Ëõ÷øÿÿÿÿ
+N	java:S106."9Replace this use of System.out or System.err by a logger.(‚¨Ö§

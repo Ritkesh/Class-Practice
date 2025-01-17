@@ -1,0 +1,14 @@
+
+c	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Žý¬Ï
+S	java:S106"9Replace this use of System.out or System.err by a logger.(ŒÕÅµýÿÿÿÿ
+h	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(û€¯´þÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(ÌÜ÷Á
+P	java:S125"<This block of commented-out lines of code should be removed.(®¯¿d
+]	java:S125"<This block of commented-out lines of code should be removed.(›´º£øÿÿÿÿ8´Á°šú1
+<
+java:S2676"Use the original value instead.(Þ®±Ù8„±šú1
+N	java:S106"9Replace this use of System.out or System.err by a logger.(éæ„¨
+J
+java:S1128".Remove this unused import 'java.util.HashSet'.(Ê‚êX8ƒ„±šú1
+L
+java:S1128"*Remove this unused import 'java.util.Set'.(ö²„¤þÿÿÿÿ8ƒ„±šú1

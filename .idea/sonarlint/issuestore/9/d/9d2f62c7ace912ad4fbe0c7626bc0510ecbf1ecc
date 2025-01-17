@@ -1,0 +1,6 @@
+
+R
+java:S1854"<Remove this useless assignment to local variable "cityList".(¥â×ç
+S	java:S106"9Replace this use of System.out or System.err by a logger.(¬ĞË‹ùÿÿÿÿ
+H
+java:S1128"-Remove this unused import 'java.util.Arrays'.(î–˜Éüÿÿÿÿ

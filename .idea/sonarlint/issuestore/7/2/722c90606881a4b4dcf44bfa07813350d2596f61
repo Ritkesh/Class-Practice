@@ -1,0 +1,11 @@
+
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.( –é‡úÿÿÿÿ
+z
+java:S1149"_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(‰ï¬Œüÿÿÿÿ
+M	java:S106
+"9Replace this use of System.out or System.err by a logger.(ƒÚáB
+M	java:S106"9Replace this use of System.out or System.err by a logger.(âùÏ=
+M	java:S106"9Replace this use of System.out or System.err by a logger.(Ä Y
+b
+java:S1858"F"str" is already a string, there's no need to call "toString()" on it.(Ä Y8äËªçÀ2
+M	java:S106"9Replace this use of System.out or System.err by a logger.(ê¨ :

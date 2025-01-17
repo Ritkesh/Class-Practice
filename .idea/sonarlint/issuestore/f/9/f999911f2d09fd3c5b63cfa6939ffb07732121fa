@@ -1,0 +1,9 @@
+
+P
+java:S1854	"5Remove this useless assignment to local variable "a".(Î¶å°ÿÿÿÿÿ
+V	java:S125"<This block of commented-out lines of code should be removed.(”úŽ¿üÿÿÿÿ
+?
+java:S1481")Remove this unused "str2" local variable.(äª¦è
+S	java:S106"9Replace this use of System.out or System.err by a logger.(“Ÿ÷Ÿüÿÿÿÿ
+Q	java:S125"<This block of commented-out lines of code should be removed.(Ù¶Ç»
+S	java:S106"9Replace this use of System.out or System.err by a logger.(æ¨¤šøÿÿÿÿ

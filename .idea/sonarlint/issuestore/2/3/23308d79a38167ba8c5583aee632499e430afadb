@@ -1,0 +1,68 @@
+
+d
+java:S1192"GDefine a constant instead of duplicating this literal "Ratan" 12 times.(÷ÎâÄ8ƒº´§2
+Y
+java:S4973"<Strings and Boxed types should be compared using "equals()".(Ò¹ªÛ8…º´§2
+Y
+java:S4973"<Strings and Boxed types should be compared using "equals()".(ÖÂÙŞ8†º´§2
+^
+java:S4973"<Strings and Boxed types should be compared using "equals()".(«ç¤Âÿÿÿÿÿ8†º´§2
+^
+java:S4973 "<Strings and Boxed types should be compared using "equals()".(Ú®†Œúÿÿÿÿ8†º´§2
+^
+java:S4973X"<Strings and Boxed types should be compared using "equals()".(¼Ú–áûÿÿÿÿ8†º´§2
+
+java:S1149."_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(…ô–ÿÿÿÿÿ8‘º´§2
+
+java:S1149/"_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(Ê—æ¡üÿÿÿÿ8‘º´§2
+|
+java:S1149J"_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(–Ë»î8‘º´§2
+{
+java:S1149O"_Replace the synchronized class "StringBuffer" by an unsynchronized one such as "StringBuilder".(÷ş}8‘º´§2
+R
+java:S1854S"5Remove this useless assignment to local variable "b".(ãöã“8’º´§2
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(±ïø½ıÿÿÿÿ8“º´§2
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(º˜ïŒıÿÿÿÿ8“º´§2
+U	java:S106"9Replace this use of System.out or System.err by a logger.(¥“À—8”º´§2
+U	java:S106"9Replace this use of System.out or System.err by a logger.(Ò¹ªÛ8•º´§2
+C
+java:S2129"!Remove this "Integer" constructor(Úã¶÷øÿÿÿÿ8šº´§2
+j
+java:S5738"HRemove this call to a deprecated method, it has been marked for removal.(Úã¶÷øÿÿÿÿ8šº´§2
+C
+java:S2129"!Remove this "Integer" constructor(…²ıÿÿÿÿ8›º´§2
+j
+java:S5738"HRemove this call to a deprecated method, it has been marked for removal.(…²ıÿÿÿÿ8›º´§2
+U	java:S106"9Replace this use of System.out or System.err by a logger.(ÖÂÙŞ8œº´§2
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(«ç¤Âÿÿÿÿÿ8œº´§2
+B
+java:S2129" Remove this "String" constructor(¯ïƒõúÿÿÿÿ8Ÿº´§2
+B
+java:S2129" Remove this "String" constructor(µÕ·‚şÿÿÿÿ8 º´§2
+Z	java:S106 "9Replace this use of System.out or System.err by a logger.(Ú®†Œúÿÿÿÿ8 º´§2
+Z	java:S106""9Replace this use of System.out or System.err by a logger.(Ÿ‰û§şÿÿÿÿ8¡º´§2
+=
+java:S2129*" Remove this "String" constructor(¦ÑŒ·8¡º´§2
+B
+java:S2129+" Remove this "String" constructor(ÙÑ­øúÿÿÿÿ8¡º´§2
+Z	java:S106,"9Replace this use of System.out or System.err by a logger.(ÖØ›Ôıÿÿÿÿ8¢º´§2
+U	java:S106-"9Replace this use of System.out or System.err by a logger.(‚ÎšÛ8¢º´§2
+Z	java:S1060"9Replace this use of System.out or System.err by a logger.(€Œ‚Ìüÿÿÿÿ8£º´§2
+Z	java:S106?"9Replace this use of System.out or System.err by a logger.(ÁÂÕúÿÿÿÿ8¤º´§2
+=
+java:S2129@" Remove this "String" constructor(ËÁÂ¦8¥º´§2
+B
+java:S2129A" Remove this "String" constructor(š­¸øÿÿÿÿ8¥º´§2
+U	java:S106B"9Replace this use of System.out or System.err by a logger.(†®¯É8¦º´§2
+B
+java:S2129C" Remove this "String" constructor(ƒà¬Èøÿÿÿÿ8©º´§2
+=
+java:S2129D" Remove this "String" constructor(ì…µÖ8©º´§2
+Z	java:S106E"9Replace this use of System.out or System.err by a logger.(ú»¨€şÿÿÿÿ8ªº´§2
+U	java:S106H"9Replace this use of System.out or System.err by a logger.(ªÃô8³º´§2
+T	java:S106L"9Replace this use of System.out or System.err by a logger.(ê¨ :8´º´§2
+Z	java:S106P"9Replace this use of System.out or System.err by a logger.(Ó†ã¬ùÿÿÿÿ8µº´§2
+C
+java:S1481S"&Remove this unused "b" local variable.(ãöã“8¶º´§2
+Z	java:S106T"9Replace this use of System.out or System.err by a logger.(æ¨¤šøÿÿÿÿ8¶º´§2
+Z	java:S106X"9Replace this use of System.out or System.err by a logger.(¼Ú–áûÿÿÿÿ8·º´§2

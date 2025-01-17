@@ -1,0 +1,26 @@
+
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(«ö¬ûÿÿÿÿ
+S	java:S106	"9Replace this use of System.out or System.err by a logger.(òñ”Šıÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(“ı¢–
+N	java:S106"9Replace this use of System.out or System.err by a logger.(µˆœÑ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(ñîàœúÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(¶Ö¨‘
+N	java:S106"9Replace this use of System.out or System.err by a logger.(²÷Ğ¸
+S	java:S106"9Replace this use of System.out or System.err by a logger.(·¬Šâúÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(óŠÆüÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(æÒÙµúÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(Ø˜…şÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(€³¾ ÿÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(¯Ùú¸
+S	java:S106!"9Replace this use of System.out or System.err by a logger.(à•ø‡øÿÿÿÿ
+O
+java:S2864""4Iterate over the "entrySet" instead of the "keySet".(İÿªúÿÿÿÿ
+S	java:S106#"9Replace this use of System.out or System.err by a logger.(ô‘¡»ıÿÿÿÿ
+N	java:S106&"9Replace this use of System.out or System.err by a logger.(Îà‡’
+N	java:S106("9Replace this use of System.out or System.err by a logger.(ÅòŸˆ
+S	java:S106*"9Replace this use of System.out or System.err by a logger.(ÓåËğùÿÿÿÿ
+N	java:S106."9Replace this use of System.out or System.err by a logger.(µˆœÑ
+N	java:S1061"9Replace this use of System.out or System.err by a logger.(ü«ª—
+N	java:S1063"9Replace this use of System.out or System.err by a logger.(µˆœÑ
+S	java:S1065"9Replace this use of System.out or System.err by a logger.(üí†Úúÿÿÿÿ
+U	java:S1067"9Replace this use of System.out or System.err by a logger.(µˆœÑ8É£õùÅ2

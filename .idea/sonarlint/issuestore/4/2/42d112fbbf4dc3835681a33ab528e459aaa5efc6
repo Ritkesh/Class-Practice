@@ -1,0 +1,15 @@
+
+>
+java:S1604"(Make this anonymous inner class a lambda(Ïï«Ã
+K
+java:S1610"5Convert the abstract class "Test2" into an interface.(•–Üù
+N	java:S106"9Replace this use of System.out or System.err by a logger.(ùõá€
+S	java:S106"9Replace this use of System.out or System.err by a logger.(™Ã²ùÿÿÿÿ
+T
+java:S1854"9Remove this useless assignment to local variable "test2".(ÏÓ©ùÿÿÿÿ
+W
+java:S2209"5Change this instance-reference to a static reference.(¡³Úˆıÿÿÿÿ8¥¼ÙÍ¶2
+–
+java:S1186"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(óÏß
+E
+java:S1481"*Remove this unused "test2" local variable.(ÏÓ©ùÿÿÿÿ
