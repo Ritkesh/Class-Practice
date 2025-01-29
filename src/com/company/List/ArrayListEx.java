@@ -7,7 +7,7 @@ class MySort implements Comparator<Integer> {
         return o2-o1;
     }
 }
-class Student{
+class Student implements Comparable<Student>{
     private String name;
     private Double gpa;
     public String getName() {
@@ -30,6 +30,10 @@ class Student{
         this.gpa = gpa;
     }
 
+    @Override
+    public int compareTo(Student o) {
+        return Double.compare(o.getGpa(),this.getGpa());
+    }
 }
 
 public class ArrayListEx {

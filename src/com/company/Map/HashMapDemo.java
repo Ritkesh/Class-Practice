@@ -1,5 +1,7 @@
 package com.company.Map;
 
+import com.company.Student;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,5 +55,24 @@ public class HashMapDemo {
         System.out.println("removing entry by using key,value both");
         map.remove(2,"NEHA");
         System.out.println(map);
+
+
+        // for getOrDefault
+        System.out.println("for getOrDefault");
+        // IN getDefault method if the key is present then its return its associated value else it returns default value set by user
+
+        HashMap<String,Integer> student = new HashMap<>();
+        student.put("Shubham",90);
+        student.put("Akshit",95);
+        System.out.println(student.getOrDefault("Shubham",20));
+        System.out.println(student.getOrDefault("Ranjan",10));
+
+        // for putIfAbsent
+        // in putIfAbsent method if the key is present then it will not do action but if key ia absent then it will put it in the map
+
+        System.out.println("for putIfAbsent");
+        student.putIfAbsent("Shubham",100);
+        student.putIfAbsent("Rohit",87);
+        System.out.println(student);
     }
 }
