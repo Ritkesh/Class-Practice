@@ -1,15 +1,11 @@
-Start processing 3 pages concurrently
-    3 page is facing ⇧, confidence 16.50 - rotation appears correct
-    2 page is facing ⇧, confidence 16.48 - rotation appears correct
-    1 page is facing ⇧, confidence 15.83 - rotation appears correct
-
-Postprocessing...
-
-
-
-
-Image optimization ratio: 1.15 savings: 13.4%
-Total file size ratio: 1.12 savings: 11.1%
-Output file is a PDF/A-2B (as expected)
-2025-04-17T15:20:54.158+05:30  INFO 95693 --- [pdfprocess] [nio-8106-exec-1] c.o.d.p.controller.PdfProcessController  : ocrmypdf process completed successfully
-2025-04-17T15:20:54.188+05:30  INFO 95693 --- [pdfprocess] [nio-8106-exec-1] c.o.d.p.controller.PdfProcessController  : Returning metadata for PDF: Test1.pdf
+private String extractValue(String page, String keyword) {
+        // Dummy implementation for extracting value
+        // You can use regex or other text processing techniques to extract the actual value
+        int index = page.indexOf(keyword);
+        if (index != -1) {
+            int startIndex = index + keyword.length();
+            int endIndex = page.indexOf("\n", startIndex);
+            return page.substring(startIndex, endIndex).trim();
+        }
+        return "";
+    }
