@@ -1,2 +1,24 @@
- saved pdf to temporary file:/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/input2686573156449628730.pdf
-OutputFileAccessError: Output file location (/Users/pdf/pdflin/Sample-filled-in-MR.pdf) is not a writable file.
+This PDF is marked as a Tagged PDF. This often indicates that the PDF was generated from an office document and does not need OCR. PDF pages processed by OCRmyPDF may not be tagged correctly.
+Start processing 4 pages concurrently
+    1 skipping all processing on this page
+    3 skipping all processing on this page
+    2 skipping all processing on this page
+    5 skipping all processing on this page
+    4 skipping all processing on this page
+    9 skipping all processing on this page
+    8 skipping all processing on this page
+    7 skipping all processing on this page
+   10 skipping all processing on this page
+    6 skipping all processing on this page
+
+Postprocessing...
+
+
+
+
+Image optimization ratio: 1.00 savings: 0.0%
+Total file size ratio: 1.70 savings: 41.0%
+Output file is a PDF/A-2B (as expected)
+2025-04-17T14:34:40.852+05:30  INFO 95693 --- [pdfprocess] [nio-8106-exec-2] c.o.d.p.controller.PdfProcessController  : ocrmypdf process completed successfully
+2025-04-17T14:34:43.875+05:30  WARN 95693 --- [pdfprocess] [nio-8106-exec-2] o.a.pdfbox.pdmodel.font.PDType0Font      : No Unicode mapping for CID+32 (32) in font XRPKZS+Arial
+2025-04-17T14:34:44.418+05:30  WARN 95693 --- [pdfprocess] [nio-8106-exec-2] o.a.pdfbox.pdmodel.font.PDType0Font      : No Unicode mapping for CID+32 (32) in font AYHAOQ+Arial,Italic
