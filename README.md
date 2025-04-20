@@ -1,7 +1,3 @@
-# Class-Practice
-#programming practice
-
-
 package com.optum.dms.pdfprocess.controller;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,11 +14,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.*;
 
 @RestController
 public class PdfProcessController {
@@ -40,6 +38,10 @@ public class PdfProcessController {
 
     @Value("${process.timeout.seconds}")
     private long processTimeoutSeconds;
+    @Value("${pdf.useLocal}")
+    private String useLocal;
+    @Value("${pdf.local.directory}")
+    private String localDirectory;
 
     @GetMapping("/process-pdf")
     public ResponseEntity<Map<String, Object>> processPdf(@RequestParam String pdfName) {
@@ -102,6 +104,77 @@ public class PdfProcessController {
         }
     }
 
+
+    @GetMapping("/process-pdf-test")
+    public ResponseEntity<Map<String, Object>> processPdfTest(@RequestParam String pdfName) {
+        logger.info("Received request to process PDF: {}", pdfName);
+        try {
+            byte[] pdfBytes = new byte[0];
+            if(Boolean.parseBoolean(useLocal)){
+                File sourceFile = new File(localDirectory,pdfName);
+                if(!sourceFile.exists()){
+                    logger.error("local pdf not found: {}",sourceFile.getAbsolutePath());
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+                }
+                logger.info("loading pdf from local path: {}",sourceFile.getAbsolutePath());
+                pdfBytes = Files.readAllBytes(sourceFile.toPath());
+            }
+
+            File inputPdf = File.createTempFile("input",".pdf");
+            try(FileOutputStream fos = new FileOutputStream(inputPdf)){
+                fos.write(pdfBytes);
+            }
+            logger.info("saved pdf to temporary file:{}",inputPdf.getAbsolutePath());
+
+            File outputPdf = new File(outputDirectory, pdfName);
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "bash","-c",
+                    "ocrmypdf", "--skip-text","--rotate-pages","--deskew","--jobs", "4", inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
+            +"&&"+"qpdf","--linearize" + outputPdf.getAbsolutePath() + " " + outputPdf.getAbsolutePath());
+            processBuilder.inheritIO();
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            logger.info("Started ocrmypdf process");
+
+            // Capture and log the process output
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info(line);
+                }
+            }
+
+            // Step 4: Handle timeout and process completion
+            boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroy();
+                logger.error("ocrmypdf process timed out");
+                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+            }
+            if (process.exitValue() != 0) {
+                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            logger.info("ocrmypdf process completed successfully");
+            // Step 5: Extract metadata for given keywords
+            Map<String, Object> metadata = extractMetadata(outputPdf, keywords);
+
+            // Step 6: Return the metadata as JSON
+            logger.info("Returning metadata for PDF: {}", pdfName);
+            return new ResponseEntity<>(metadata, HttpStatus.OK);
+        } catch (IOException e) {
+            logger.error("Error processing PDF: {}", pdfName, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            logger.error("Error processing PDF: {}", pdfName, e);
+            return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+        }
+    }
+
+
+
+
     private Map<String, Object> extractMetadata(File pdfFile, String[] keywords) throws IOException {
         Map<String, Object> metadata = new HashMap<>();
         try (PDDocument document = PDDocument.load(pdfFile)) {
@@ -130,11 +203,17 @@ public class PdfProcessController {
     private String extractValue(String page, String keyword) {
         // Dummy implementation for extracting value
         // You can use regex or other text processing techniques to extract the actual value
-        int index = page.indexOf(keyword);
-        if (index != -1) {
-            int startIndex = index + keyword.length();
-            int endIndex = page.indexOf("\n", startIndex);
-            return page.substring(startIndex, endIndex).trim();
+//        int index = page.indexOf(keyword);
+//        if (index != -1) {
+//            int startIndex = index + keyword.length();
+//            int endIndex = page.indexOf("\n", startIndex);
+//            return page.substring(startIndex, endIndex).trim();
+//        }
+        String regex = Pattern.quote(keyword) + "\\s*:?\\s*(.+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(page);
+        if(matcher.find()){
+            return matcher.group(1).trim();
         }
         return "";
     }
