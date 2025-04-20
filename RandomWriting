@@ -1,5 +1,4 @@
-package com.optum.dms.pdfprocess.controller;
-
+package com.example.OcrMyPdf.controller;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
@@ -104,38 +103,47 @@ public class PdfProcessController {
         }
     }
 
-
     @GetMapping("/process-pdf-test")
     public ResponseEntity<Map<String, Object>> processPdfTest(@RequestParam String pdfName) {
         logger.info("Received request to process PDF: {}", pdfName);
         try {
             byte[] pdfBytes = new byte[0];
-            if(Boolean.parseBoolean(useLocal)){
-                File sourceFile = new File(localDirectory,pdfName);
-                if(!sourceFile.exists()){
-                    logger.error("local pdf not found: {}",sourceFile.getAbsolutePath());
+            if (Boolean.parseBoolean(useLocal)) {
+                File sourceFile = new File(localDirectory, pdfName);
+                if (!sourceFile.exists()) {
+                    logger.error("Local PDF not found: {}", sourceFile.getAbsolutePath());
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
                 }
-                logger.info("loading pdf from local path: {}",sourceFile.getAbsolutePath());
+                logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
                 pdfBytes = Files.readAllBytes(sourceFile.toPath());
             }
 
-            File inputPdf = File.createTempFile("input",".pdf");
-            try(FileOutputStream fos = new FileOutputStream(inputPdf)){
+            File inputPdf = File.createTempFile("input", ".pdf");
+            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
                 fos.write(pdfBytes);
             }
-            logger.info("saved pdf to temporary file:{}",inputPdf.getAbsolutePath());
+            logger.info("Saved PDF to temporary file: {}", inputPdf.getAbsolutePath());
 
             File outputPdf = new File(outputDirectory, pdfName);
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    "ocrmypdf", "--skip-text","--rotate-pages","--deskew","--jobs", "4", inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath());
+
+            // Convert paths to WSL-compatible paths
+            String inputPathWsl = toWslPath(inputPdf.getAbsolutePath());
+            String outputPathWsl = toWslPath(outputPdf.getAbsolutePath());
+
+            // Run OCRmyPDF command with PDF/A-2b compliance
+            String ocrmypdfCommand = String.format(
+                    "ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 --output-type pdfa \"%s\" \"%s\"",
+                    inputPathWsl, outputPathWsl
+            );
+            logger.info("Running OCRmyPDF with command: {}", ocrmypdfCommand);
+
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrmypdfCommand);
             processBuilder.inheritIO();
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            logger.info("Started ocrmypdf process");
+            logger.info("Started OCRmyPDF process");
 
-            // Capture and log the process output
+            // Capture and log the OCRmyPDF process output
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -143,24 +151,53 @@ public class PdfProcessController {
                 }
             }
 
-            // Step 4: Handle timeout and process completion
+            // Wait for OCRmyPDF process to finish
             boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroy();
-                logger.error("ocrmypdf process timed out");
+                logger.error("OCRmyPDF process timed out");
                 return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
             }
             if (process.exitValue() != 0) {
-                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
+                logger.error("OCRmyPDF process failed with exit code {}", process.exitValue());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            logger.info("ocrmypdf process completed successfully");
-            // Step 5: Extract metadata for given keywords
-            Map<String, Object> metadata = extractMetadata(outputPdf, keywords);
+            logger.info("OCRmyPDF process completed successfully");
 
-            // Step 6: Return the metadata as JSON
+            // Linearize the output PDF in-place using QPDF
+            String linearizeCommand = String.format("qpdf --linearize --replace-input \"%s\"", outputPathWsl);
+            ProcessBuilder linearizeProcessBuilder = new ProcessBuilder("bash", "-c", linearizeCommand);
+            linearizeProcessBuilder.inheritIO();
+            linearizeProcessBuilder.redirectErrorStream(true);
+            Process linearizeProcess = linearizeProcessBuilder.start();
+            logger.info("Started QPDF linearization process");
+
+            // Capture and log the QPDF linearization process output
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(linearizeProcess.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info(line);
+                }
+            }
+
+            // Wait for QPDF linearization process to finish
+            boolean linearizationFinished = linearizeProcess.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
+            if (!linearizationFinished) {
+                linearizeProcess.destroy();
+                logger.error("QPDF linearization process timed out");
+                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+            }
+            if (linearizeProcess.exitValue() != 0) {
+                logger.error("QPDF linearization process failed with exit code {}", linearizeProcess.exitValue());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            logger.info("QPDF linearization process completed successfully");
+
+            // Extract metadata from the final linearized PDF
+            Map<String, Object> metadata = extractMetadata(outputPdf, keywords);
             logger.info("Returning metadata for PDF: {}", pdfName);
             return new ResponseEntity<>(metadata, HttpStatus.OK);
+
         } catch (IOException e) {
             logger.error("Error processing PDF: {}", pdfName, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -169,6 +206,15 @@ public class PdfProcessController {
             return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
         }
     }
+
+    // Helper to convert Windows path to WSL path
+    private String toWslPath(String windowsPath) {
+        return windowsPath
+                .replace("C:\\", "/mnt/c/")
+                .replace("D:\\", "/mnt/d/")
+                .replace("\\", "/");
+    }
+
 
 
 
