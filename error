@@ -1,1 +1,2 @@
-spring.data.mongodb.uri = mongodb+srv://PdfProcess:PdfProcess123@clustertest.sjfrl.mongodb.net/TestConnection?retryWrites=true&w=majority&appName=ClusterTest
+spring.data.mongodb.uri = mongodb://PdfProcess:PdfProcess123@clustertest-shard-00-00.sjfrl.mongodb.net:27017,clustertest-shard-00-01.sjfrl.mongodb.net:27017,clustertest-shard-00-02.sjfrl.mongodb.net:27017/TestConnection?ssl=true&replicaSet=atlas-12rkzw-shard-0&authSource=admin&retryWrites=true&w=majority
+
