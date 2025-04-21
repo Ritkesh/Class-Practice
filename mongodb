@@ -1,1 +1,36 @@
 
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.model.GridFSUploadOptions;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Paths;
+
+public class PDFUploader {
+    public static void main(String[] args) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) {
+            MongoDatabase database = mongoClient.getDatabase("yourDatabase");
+
+            // Create a GridFS bucket
+            GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+
+            // Input stream of your PDF
+            InputStream pdfStream = new FileInputStream("path/to/your/file.pdf");
+
+            // Uploading the file
+            GridFSUploadOptions options = new GridFSUploadOptions()
+                    .chunkSizeBytes(358400) // Optional
+                    .metadata(new org.bson.Document("type", "pdf").append("uploadedBy", "JavaApp"));
+
+            gridFSBucket.uploadFromStream("your_file_name.pdf", pdfStream, options);
+
+            System.out.println("PDF uploaded successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
