@@ -1,68 +1,20 @@
-@GetMapping("/process-pdf-test-1")
-public ResponseEntity<Map<String, Object>> processPdfTest(@RequestParam String pdfName) {
-    logger.info("Received request to process PDF: {}", pdfName);
-    try {
-        byte[] pdfBytes = new byte[0];
-        if (Boolean.parseBoolean(useLocal)) {
-            File sourceFile = new File(localDirectory, pdfName);
-            if (!sourceFile.exists()) {
-                logger.error("local pdf not found: {}", sourceFile.getAbsolutePath());
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            logger.info("loading pdf from local path: {}", sourceFile.getAbsolutePath());
-            pdfBytes = Files.readAllBytes(sourceFile.toPath());
-        }
+private void uploadToDummyServer(File file) {
+    RestTemplate restTemplate = new RestTemplate();
+    FileSystemResource resource = new FileSystemResource(file);
 
-        File inputPdf = File.createTempFile("input", ".pdf");
-        try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
-            fos.write(pdfBytes);
-        }
-        logger.info("saved pdf to temporary file: {}", inputPdf.getAbsolutePath());
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("file", resource);
 
-        File outputPdf = new File(outputDirectory, pdfName.replace(".pdf", "_linearized.pdf"));
-        String ocrMyPdfCommand = String.format("ocrmypdf --skip-text --rotate-pages --deskew --jobs 4  \"%s\" \"%s\"",
-                inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath());
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrMyPdfCommand);
-        processBuilder.inheritIO();
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        logger.info("Started ocrmypdf process");
+    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logger.info(line);
-            }
-        }
+    ResponseEntity<String> response = restTemplate.postForEntity(dummyServerUploadUrl, requestEntity, String.class);
 
-        boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
-        if (!finished) {
-            process.destroy();
-            logger.error("ocrmypdf process timed out");
-            return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
-        }
-        if (process.exitValue() != 0) {
-            logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        logger.info("ocrmypdf process completed successfully");
-
-        // Fire-and-forget upload to dummy server
-        CompletableFuture.runAsync(() -> {
-            try {
-                uploadToDummyServer(outputPdf);
-            } catch (Exception e) {
-                logger.error("Async upload to dummy server failed", e);
-            }
-        });
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    } catch (IOException e) {
-        logger.error("Error processing PDF: {}", pdfName, e);
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    } catch (InterruptedException e) {
-        logger.error("Error processing PDF: {}", pdfName, e);
-        return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+    if (!response.getStatusCode().is2xxSuccessful()) {
+        throw new RuntimeException("Failed to upload to dummy server. Status: " + response.getStatusCode());
     }
+
+    logger.info("Successfully uploaded PDF to dummy server");
 }
