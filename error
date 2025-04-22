@@ -1,10 +1,6 @@
-@GetMapping("/download/{fileId}")
-public ResponseEntity<byte[]> downloadFile(@PathVariable String fileId) {
-    FileDocument fileDoc = fileRepository.findById(fileId).orElseThrow();
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.parseMediaType(fileDoc.getMimeType())); // e.g., "application/pdf"
-    headers.setContentDisposition(ContentDisposition.inline().filename(fileDoc.getFileName()).build());
-
-    return new ResponseEntity<>(fileDoc.getData(), headers, HttpStatus.OK);
-}
+#spring.data.mongodb.uri = mongodb+srv://ritkeshsingh91:Rit91Su99@clustertest.sjfrl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTest
+##spring.data.mongodb.host = localhost
+##spring.data.mongodb.port = 27017
+#spring.data.mongodb.database = journaldb
+##spring.data.mongodb.username = ritkeshsingh91
+##spring.data.mongodb.password = Ritsu91@
