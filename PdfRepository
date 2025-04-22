@@ -1,0 +1,7 @@
+package com.example.OcrMyPdf.Repository;
+
+import com.example.OcrMyPdf.Entity.PdfDocument;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface Pdfrepository extends MongoRepository<PdfDocument, String> {
+}
