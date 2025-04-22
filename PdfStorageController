@@ -1,0 +1,41 @@
+package com.example.OcrMyPdf.controller;
+
+import com.example.OcrMyPdf.Sevices.PdfStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+@RestController
+public class PdfStorageController {
+
+    @Autowired
+    private PdfStorageService pdfStorageService;
+
+    // Trigger file upload from the path configured in application.properties
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFromConfigPath() {
+        try {
+            String id = pdfStorageService.savePdfFromConfiguredPath();
+            return ResponseEntity.ok("PDF stored with ID: " + id);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Failed to store PDF: " + e.getMessage());
+        }
+    }
+
+    // Optional: Get PDF by ID
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> getPdf(@PathVariable String id) {
+        byte[] pdfData = pdfStorageService.getPdfById(id);
+        if (pdfData != null) {
+            return ResponseEntity
+                    .ok()
+                    .header("Content-Type", "application/pdf")
+                    .body(pdfData);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
+
