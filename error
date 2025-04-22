@@ -1,10 +1,28 @@
-//spring.profiles.active=local
-spring.data.mongodb.uri = mongodb+srv://ritkeshsingh91:Rit91Su99@clustertest.sjfrl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTest
-spring.data.mongodb.database=journaldb
-server.port=0
-pdf.api.url=http://localhost:9035/get-pdf?pdfName=
-pdf.keywords=name,currency
-pdf.output.directory=/Users/ritkesh_singh@optum.com/Output/
-process.timeout.seconds=60
-pdf.useLocal=true
-pdf.local.directory=/Users/ritkesh_singh@optum.com/Downloads/
+   @PostMapping("/upload")
+    public void PDFUploader() {
+            try(MongoClient mongoClient = MongoClients.create("mongodb+srv://PdfProcess:PdfProcess123@clustertest.sjfrl.mongodb.net/TestConnection?retryWrites=true&w=majority&appName=ClusterTest")){
+                MongoDatabase database = mongoClient.getDatabase("TestConnection");
+
+                // Create a GridFS bucket
+                GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+
+                // Input stream of your PDF
+            InputStream pdfStream = null;
+            try {
+                pdfStream = new FileInputStream("/Users/ritkesh_singh@optum.com/Output/ED1.pdf");
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            // Uploading the file
+                GridFSUploadOptions options = new GridFSUploadOptions()
+                        .chunkSizeBytes(358400) // Optional
+                        .metadata(new org.bson.Document("type", "pdf").append("uploadedBy", "JavaApp"));
+
+                gridFSBucket.uploadFromStream("ED1_output.pdf", pdfStream, options);
+
+                System.out.println("PDF uploaded successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
