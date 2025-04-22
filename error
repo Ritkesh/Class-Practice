@@ -1,4 +1,115 @@
- private void uploadToDummyServer(File file) {
+package com.optum.dms.pdfprocess.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+@RestController
+
+public class OcrController {
+
+
+    @Value("${pdf.output.directory}")
+    private String outputDirectory;
+    @Value("${pdf.output.test}")
+    private String test;
+
+    @Value("${process.timeout.seconds}")
+    private long processTimeoutSeconds;
+    @Value("${pdf.useLocal}")
+    private String useLocal;
+    @Value("${pdf.local.directory}")
+    private String localDirectory;
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfProcessController.class);
+
+    @GetMapping("/process-pdf-test-1")
+    public ResponseEntity<Map<String, Object>> processPdfTest(@RequestParam String pdfName) {
+        logger.info("Received request to process PDF: {}", pdfName);
+        try {
+            byte[] pdfBytes = new byte[0];
+            if (Boolean.parseBoolean(useLocal)) {
+                File sourceFile = new File(localDirectory, pdfName);
+                if (!sourceFile.exists()) {
+                    logger.error("local pdf not found: {}", sourceFile.getAbsolutePath());
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+                logger.info("loading pdf from local path: {}", sourceFile.getAbsolutePath());
+                pdfBytes = Files.readAllBytes(sourceFile.toPath());
+            }
+
+            File inputPdf = File.createTempFile("input", ".pdf");
+            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
+                fos.write(pdfBytes);
+            }
+            logger.info("saved pdf to temporary file: {}", inputPdf.getAbsolutePath());
+
+            File outputPdf = new File(outputDirectory, pdfName.replace(".pdf", "_linearized.pdf"));
+            String ocrMyPdfCommand = String.format("ocrmypdf --skip-text --rotate-pages --deskew --jobs 4  \"%s\" \"%s\"",
+                    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath());
+
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrMyPdfCommand);
+            processBuilder.inheritIO();
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            logger.info("Started ocrmypdf process");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info(line);
+                }
+            }
+
+            boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroy();
+                logger.error("ocrmypdf process timed out");
+                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+            }
+            if (process.exitValue() != 0) {
+                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            logger.info("ocrmypdf process completed successfully");
+
+            // Fire-and-forget upload to dummy server
+            CompletableFuture.runAsync(() -> {
+                try {
+                    uploadToDummyServer(outputPdf);
+                } catch (Exception e) {
+                    logger.error("Async upload to dummy server failed", e);
+                }
+            });
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IOException e) {
+            logger.error("Error processing PDF: {}", pdfName, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InterruptedException e) {
+            logger.error("Error processing PDF: {}", pdfName, e);
+            return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+        }
+    }
+
+
+    private void uploadToDummyServer(File file) {
         RestTemplate restTemplate = new RestTemplate();
         FileSystemResource resource = new FileSystemResource(file);
 
@@ -18,3 +129,11 @@
 
         logger.info("Successfully uploaded PDF to dummy server");
     }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> fileUploadOnServer(@RequestParam File outputPdf){
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+}
