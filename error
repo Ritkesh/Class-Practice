@@ -1,6 +1,10 @@
-#spring.data.mongodb.uri = mongodb+srv://ritkeshsingh91:Rit91Su99@clustertest.sjfrl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTest
-##spring.data.mongodb.host = localhost
-##spring.data.mongodb.port = 27017
-#spring.data.mongodb.database = journaldb
-##spring.data.mongodb.username = ritkeshsingh91
-##spring.data.mongodb.password = Ritsu91@
+//spring.profiles.active=local
+spring.data.mongodb.uri = mongodb+srv://ritkeshsingh91:Rit91Su99@clustertest.sjfrl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTest
+spring.data.mongodb.database=journaldb
+server.port=0
+pdf.api.url=http://localhost:9035/get-pdf?pdfName=
+pdf.keywords=name,currency
+pdf.output.directory=/Users/ritkesh_singh@optum.com/Output/
+process.timeout.seconds=60
+pdf.useLocal=true
+pdf.local.directory=/Users/ritkesh_singh@optum.com/Downloads/
