@@ -1,4 +1,4 @@
-ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % curl -v https://nuxeodev.optum.com 
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % curl -v https://nuxeodev.optum.com/nuxeo
 * Host nuxeodev.optum.com:443 was resolved.
 * IPv6: (none)
 * IPv4: 10.87.146.90
@@ -24,21 +24,14 @@ ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % curl -v https://nuxeodev.optum.com
 *  issuer: C=GB; ST=Greater Manchester; L=Salford; O=COMODO CA Limited; CN=COMODO RSA Organization Validation Secure Server CA
 *  SSL certificate verify ok.
 * using HTTP/1.x
-> GET / HTTP/1.1
+> GET /nuxeo HTTP/1.1
 > Host: nuxeodev.optum.com
 > User-Agent: curl/8.7.1
 > Accept: */*
 > 
 * Request completely sent off
-< HTTP/1.1 200 
-< accept-ranges: bytes
-< etag: W/"51-1743471379987"
-< last-modified: Tue, 01 Apr 2025 01:36:19 GMT
-< content-type: text/html
-< content-length: 51
-< date: Wed, 23 Apr 2025 07:53:25 GMT
-< set-cookie: SERVERID=nuxeodev_s1|aAice|aAice; path=/; Secure
-< cache-control: private
-< 
-<META HTTP-EQUIV="refresh" CONTENT="0;URL=/nuxeo">
-* Connection #0 to host nuxeodev.optum.com left intact
+< HTTP/1.1 302 
+< location: /nuxeo/
+< transfer-encoding: chunked
+< date: Wed, 23 Apr 2025 07:57:11 GMT
+< set-cookie: SERVERID=nuxeodev_s1|aAidW|aAidW; path=/; Secure
