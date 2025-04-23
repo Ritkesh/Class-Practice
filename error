@@ -87,9 +87,9 @@ public class OcrController {
 
             CompletableFuture.runAsync(() -> {
                 try {
-                    uploadLocallyAsAPI(outputPdf);
+                    uploadToExternalUrl(outputPdf);
                 } catch (Exception e) {
-                    logger.error("Async upload to local API failed", e);
+                    logger.error("Async upload to external API failed", e);
                 }
             });
 
@@ -101,14 +101,14 @@ public class OcrController {
         }
     }
 
-    // Simulates internal HTTP call to our own receive API
-    private void uploadLocallyAsAPI(File file) {
-        String uploadUrl = "http://localhost:8104/receive-file"; // same app, but treat like a client
+    // Upload to external web API
+    private void uploadToExternalUrl(File file) {
+        String uploadUrl = "https://xyz.com"; // Replace with your actual endpoint
         RestTemplate restTemplate = new RestTemplate();
         FileSystemResource resource = new FileSystemResource(file);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", resource);
+        body.add("file", resource); // Adjust key if required by API
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -118,13 +118,13 @@ public class OcrController {
         ResponseEntity<String> response = restTemplate.postForEntity(uploadUrl, requestEntity, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to upload internally. Status: " + response.getStatusCode());
+            throw new RuntimeException("Failed to upload externally. Status: " + response.getStatusCode());
         }
 
-        logger.info("Successfully uploaded PDF internally to /receive-file");
+        logger.info("Successfully uploaded PDF externally to {}", uploadUrl);
     }
 
-    // This is the file receiver endpoint (uploads to /users/output/)
+    // Optional: still keep for local uploads if needed
     @PostMapping("/receive-file")
     public ResponseEntity<String> receiveFile(@RequestParam("file") MultipartFile file) {
         try {
