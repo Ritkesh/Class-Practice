@@ -33,5 +33,7 @@ ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % curl -v https://nuxeodev.optum.com/n
 < HTTP/1.1 302 
 < location: /nuxeo/
 < transfer-encoding: chunked
-< date: Wed, 23 Apr 2025 07:57:11 GMT
-< set-cookie: SERVERID=nuxeodev_s1|aAidW|aAidW; path=/; Secure
+< date: Wed, 23 Apr 2025 07:59:55 GMT
+< set-cookie: SERVERID=nuxeodev_s1|aAid/|aAid/; path=/; Secure
+< 
+* Connection #0 to host nuxeodev.optum.com left intact
