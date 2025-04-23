@@ -1,5 +1,6 @@
 package com.optum.dms.pdfprocess.controller;
 
+import com.optum.dms.pdfprocess.dto.UploadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,7 +88,7 @@ public class OcrController {
 
             CompletableFuture.runAsync(() -> {
                 try {
-                    uploadToExternalUrl(outputPdf);
+                    uploadToExternalApi(outputPdf);
                 } catch (Exception e) {
                     logger.error("Async upload to external API failed", e);
                 }
@@ -101,30 +102,40 @@ public class OcrController {
         }
     }
 
-    // Upload to external web API
-    private void uploadToExternalUrl(File file) {
-        String uploadUrl = "https://xyz.com"; // Replace with your actual endpoint
+    private void uploadToExternalApi(File file) {
+        String uploadUrl = "https://xyz.com";
         RestTemplate restTemplate = new RestTemplate();
         FileSystemResource resource = new FileSystemResource(file);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", resource); // Adjust key if required by API
+        body.add("file", resource);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(uploadUrl, requestEntity, String.class);
+        try {
+            ResponseEntity<UploadResponse> response = restTemplate.postForEntity(uploadUrl, requestEntity, UploadResponse.class);
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Failed to upload externally. Status: " + response.getStatusCode());
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                UploadResponse uploadResponse = response.getBody();
+                if (uploadResponse.getFileUrl() != null) {
+                    logger.info("Uploaded PDF available at: {}", uploadResponse.getFileUrl());
+                } else if (uploadResponse.getPath() != null) {
+                    logger.info("Uploaded file path: {}", uploadResponse.getPath());
+                } else {
+                    logger.info("Upload successful but response lacks file path info.");
+                }
+            } else {
+                logger.error("Failed to upload. Status: {}, Body: {}", response.getStatusCode(), response.getBody());
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception during upload to external API", e);
         }
-
-        logger.info("Successfully uploaded PDF externally to {}", uploadUrl);
     }
 
-    // Optional: still keep for local uploads if needed
     @PostMapping("/receive-file")
     public ResponseEntity<String> receiveFile(@RequestParam("file") MultipartFile file) {
         try {
