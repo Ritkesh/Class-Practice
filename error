@@ -1,2 +1,44 @@
-2025-04-23T12:45:30.218+05:30  INFO 42477 --- [onPool-worker-1] c.o.d.p.controller.OcrController         : Uploaded file path: <META HTTP-EQUIV="refresh" CONTENT="0;URL=/nuxeo">
-
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % curl -v https://nuxeodev.optum.com 
+* Host nuxeodev.optum.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 10.87.146.90
+*   Trying 10.87.146.90:443...
+* Connected to nuxeodev.optum.com (10.87.146.90) port 443
+* ALPN: curl offers h2,http/1.1
+* (304) (OUT), TLS handshake, Client hello (1):
+*  CAfile: /etc/ssl/cert.pem
+*  CApath: none
+* (304) (IN), TLS handshake, Server hello (2):
+* (304) (IN), TLS handshake, Unknown (8):
+* (304) (IN), TLS handshake, Certificate (11):
+* (304) (IN), TLS handshake, CERT verify (15):
+* (304) (IN), TLS handshake, Finished (20):
+* (304) (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256 / [blank] / UNDEF
+* ALPN: server did not agree on a protocol. Uses default.
+* Server certificate:
+*  subject: C=US; ST=Minnesota; O=UnitedHealth Group Inc.; CN=nuxeodev.optum.com
+*  start date: Apr  8 00:00:00 2025 GMT
+*  expire date: Apr  8 23:59:59 2026 GMT
+*  subjectAltName: host "nuxeodev.optum.com" matched cert's "nuxeodev.optum.com"
+*  issuer: C=GB; ST=Greater Manchester; L=Salford; O=COMODO CA Limited; CN=COMODO RSA Organization Validation Secure Server CA
+*  SSL certificate verify ok.
+* using HTTP/1.x
+> GET / HTTP/1.1
+> Host: nuxeodev.optum.com
+> User-Agent: curl/8.7.1
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 200 
+< accept-ranges: bytes
+< etag: W/"51-1743471379987"
+< last-modified: Tue, 01 Apr 2025 01:36:19 GMT
+< content-type: text/html
+< content-length: 51
+< date: Wed, 23 Apr 2025 07:53:25 GMT
+< set-cookie: SERVERID=nuxeodev_s1|aAice|aAice; path=/; Secure
+< cache-control: private
+< 
+<META HTTP-EQUIV="refresh" CONTENT="0;URL=/nuxeo">
+* Connection #0 to host nuxeodev.optum.com left intact
