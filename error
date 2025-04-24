@@ -1,81 +1,126 @@
-public ResponseEntity<byte[]> processPdfTest(PdfDocument pdfDocument) {
-    String pdfName = pdfDocument.getPdfName(); // Get the PDF name from the PdfDocument object
-    logger.info("Received request to process PDF: {}", pdfName);
+package com.optum.dms.pdfprocess.service;
+import com.optum.dms.pdfprocess.entity.PdfDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-    try {
-        byte[] pdfBytes = new byte[0];
-        if (Boolean.parseBoolean(useLocal)) {
-            // Use pdfName to locate the PDF file
-            File sourceFile = new File(localDirectory, pdfName);
-            if (!sourceFile.exists()) {
-                logger.error("Local PDF not found: {}", sourceFile.getAbsolutePath());
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+import java.io.*;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+public class OcrHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(OcrHandler.class);
+
+
+    public ResponseEntity<byte[]> processPdfTest(PdfDocument pdfDocument) {
+        String pdfName = pdfDocument.getId(); // Get the PDF name from the PdfDocument object
+        logger.info("Received request to process PDF: {}", pdfName);
+
+        try {
+            byte[] pdfBytes = new byte[0];
+            if (Boolean.parseBoolean(useLocal)) {
+                File sourceFile = new File(localDirectory, pdfName);
+                if (!sourceFile.exists()) {
+                    logger.error("Local PDF not found: {}", sourceFile.getAbsolutePath());
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+                logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
+                pdfBytes = Files.readAllBytes(sourceFile.toPath());
             }
-            logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
-            pdfBytes = Files.readAllBytes(sourceFile.toPath());
-        }
-
-        // Use ByteArrayOutputStream to avoid saving the file to disk
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        
-        // Create a temporary input PDF in memory
-        File inputPdf = File.createTempFile("input", ".pdf");
-        try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
-            fos.write(pdfBytes);
-        }
-        logger.info("Saved PDF to temporary file: {}", inputPdf.getAbsolutePath());
-
-        // Run the OCR process and store output in memory
-        String ocrMyPdfCommand = String.format("ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 \"%s\" -", 
-                inputPdf.getAbsolutePath());  // Use '-' to indicate output to stdout
-        
-        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrMyPdfCommand);
-        processBuilder.inheritIO();
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-        logger.info("Started ocrmypdf process");
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logger.info(line);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            
+            File inputPdf = File.createTempFile("input", ".pdf");
+            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
+                fos.write(pdfBytes);
             }
-        }
+            logger.info("Saved PDF to temporary file: {}", inputPdf.getAbsolutePath());
+            
+            String ocrMyPdfCommand = String.format("ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 \"%s\" -",
+                    inputPdf.getAbsolutePath());  
 
-        // Wait for the process to finish within the timeout
-        boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
-        if (!finished) {
-            process.destroy();
-            logger.error("ocrmypdf process timed out");
-            return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
-        }
-        if (process.exitValue() != 0) {
-            logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrMyPdfCommand);
+            processBuilder.inheritIO();
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            logger.info("Started ocrmypdf process");
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info(line);
+                }
+            }
+
+            // Wait for the process to finish within the timeout
+            boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroy();
+                logger.error("ocrmypdf process timed out");
+                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+            }
+            if (process.exitValue() != 0) {
+                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            logger.info("ocrmypdf process completed successfully");
+
+            // Output the processed PDF directly into the byteArrayOutputStream
+            try (InputStream inputStream = process.getInputStream()) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+            }
+
+            // Get the byte array from the ByteArrayOutputStream
+            byte[] outputPdfBytes = byteArrayOutputStream.toByteArray();
+
+            // Return the processed PDF as a ResponseEntity
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + pdfName.replace(".pdf", "_linearized.pdf"))
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(outputPdfBytes);
+
+        } catch (IOException | InterruptedException e) {
+            logger.error("Error processing PDF: {}", pdfName, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        logger.info("ocrmypdf process completed successfully");
-
-        // Output the processed PDF directly into the byteArrayOutputStream
-        try (InputStream inputStream = process.getInputStream()) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-        }
-
-        // Get the byte array from the ByteArrayOutputStream
-        byte[] outputPdfBytes = byteArrayOutputStream.toByteArray();
-
-        // Return the processed PDF as a ResponseEntity
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + pdfName.replace(".pdf", "_linearized.pdf"))
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(outputPdfBytes);
-
-    } catch (IOException | InterruptedException e) {
-        logger.error("Error processing PDF: {}", pdfName, e);
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    private void uploadToExternalApi(File file) {
+//        String uploadUrl = "https://nuxeodev.optum.com/nuxeo/ui/#!/home";
+        String uploadUrl = "https://upload.gofile.io/uploadfile";
+        RestTemplate restTemplate = new RestTemplate();
+        FileSystemResource resource = new FileSystemResource(file);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", resource);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth("dmsjadenx_nprd","prC1Y!ZU3%RU8stQ");
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+//            ResponseEntity<UploadResponse> response = restTemplate.postForEntity(uploadUrl, requestEntity, UploadResponse.class);
+            ResponseEntity<String> response = restTemplate.exchange(uploadUrl,HttpMethod.PUT, requestEntity, String.class);
+            Pattern pattern = Pattern.compile("URL=([^\"])");
+/
+            logger.info("pdf uploaded successfully");
+
+        } catch (Exception e) {
+            logger.error("Exception during upload to external API", e);
+        }
+    }
+    
+
+    
 }
