@@ -1,2 +1,78 @@
-package com.optum.dms.pdfprocess.Repository;
 package com.optum.dms.pdfprocess;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+@EnableMongoRepositories(basePackages = "package com.optum.dms.pdfprocess.Repository")
+@SpringBootApplication
+public class PdfProcessApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(PdfProcessApplication.class, args);
+	}
+
+}
+this is the main class
+-----------------------
+
+package com.optum.dms.pdfprocess.Repository;
+
+
+import com.optum.dms.pdfprocess.Entity.PdfDocument;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface PdfRepository extends MongoRepository<PdfDocument, String> {
+
+    List<PdfDocument> findAllByStatus(String Status);
+}
+this is the repository
+----------------------
+
+package com.optum.dms.pdfprocess.Services;
+
+import com.optum.dms.pdfprocess.Entity.PdfDocument;
+import com.optum.dms.pdfprocess.Repository.PdfRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+@Service
+    public class PdfStorageService {
+
+//        @Value("${pdf.upload.path}")
+        private String pdfFilePath = "";
+        @Autowired
+        PdfRepository pdfRepository;
+
+        public String savePdfFromConfiguredPath() throws IOException {
+            File file = new File(pdfFilePath);
+            if (!file.exists()) {
+                throw new IOException("File does not exist at: " + pdfFilePath);
+            }
+
+            PdfDocument document = new PdfDocument();
+            document.setFileName(file.getName());
+            document.setContent(Files.readAllBytes(file.toPath()));
+            return pdfRepository.save(document).getId();
+        }
+
+        public byte[] getPdfById(String id) {
+            return pdfRepository.findById(id)
+                    .map(PdfDocument::getContent)
+                    .orElse(null);
+        }
+        public List<PdfDocument> findAllDocumentByStatus(String st){
+            return pdfRepository.findAllByStatus(st);
+        }
+    }
+this is the service class
