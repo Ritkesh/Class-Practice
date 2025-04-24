@@ -1,169 +1,50 @@
-package com.optum.dms.pdfprocess.controller;
+/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:55186,suspend=y,server=n -javaagent:/Users/ritkesh_singh@optum.com/Library/Caches/JetBrains/IdeaIC2024.2/captureAgent/debugger-agent.jar -Dkotlinx.coroutines.debug.enable.creation.stack.trace=false -Ddebugger.agent.enable.coroutines=true -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/target/classes:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.4.4/spring-boot-starter-web-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter/3.4.4/spring-boot-starter-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.4.4/spring-boot-starter-logging-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/ch/qos/logback/logback-classic/1.5.18/logback-classic-1.5.18.jar:/Users/ritkesh_singh@optum.com/.m2/repository/ch/qos/logback/logback-core/1.5.18/logback-core-1.5.18.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.24.3/log4j-to-slf4j-2.24.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/Users/ritkesh_singh@optum.com/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/yaml/snakeyaml/2.3/snakeyaml-2.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.4.4/spring-boot-starter-json-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.3/jackson-databind-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.3/jackson-annotations-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.3/jackson-core-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.18.3/jackson-datatype-jdk8-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.18.3/jackson-datatype-jsr310-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.18.3/jackson-module-parameter-names-2.18.3.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.4.4/spring-boot-starter-tomcat-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.39/tomcat-embed-core-10.1.39.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.39/tomcat-embed-el-10.1.39.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.39/tomcat-embed-websocket-10.1.39.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-web/6.2.5/spring-web-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-beans/6.2.5/spring-beans-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/io/micrometer/micrometer-observation/1.14.5/micrometer-observation-1.14.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/io/micrometer/micrometer-commons/1.14.5/micrometer-commons-1.14.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-webmvc/6.2.5/spring-webmvc-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-aop/6.2.5/spring-aop-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-context/6.2.5/spring-context-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-expression/6.2.5/spring-expression-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-starter-data-mongodb/3.4.4/spring-boot-starter-data-mongodb-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/mongodb/bson/5.2.1/bson-5.2.1.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/mongodb/bson-record-codec/5.2.1/bson-record-codec-5.2.1.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/data/spring-data-mongodb/4.4.4/spring-data-mongodb-4.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-tx/6.2.5/spring-tx-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/data/spring-data-commons/3.4.4/spring-data-commons-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-devtools/3.4.4/spring-boot-devtools-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot/3.4.4/spring-boot-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.4.4/spring-boot-autoconfigure-3.4.4.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/pdfbox/pdfbox/2.0.27/pdfbox-2.0.27.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/apache/pdfbox/fontbox/2.0.27/fontbox-2.0.27.jar:/Users/ritkesh_singh@optum.com/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-core/6.2.5/spring-core-6.2.5.jar:/Users/ritkesh_singh@optum.com/.m2/repository/org/springframework/spring-jcl/6.2.5/spring-jcl-6.2.5.jar:/Applications/IntelliJ IDEA CE.app/Contents/lib/idea_rt.jar com.optum.dms.pdfprocess.PdfProcessApplication
+Connected to the target VM, address: '127.0.0.1:55186', transport: 'socket'
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
 
-import com.optum.dms.pdfprocess.Entity.UploadResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+ :: Spring Boot ::                (v3.4.4)
 
-@RestController
-public class OcrController {
+2025-04-24T12:13:32.882+05:30  INFO 31713 --- [  restartedMain] c.o.d.pdfprocess.PdfProcessApplication   : Starting PdfProcessApplication using Java 21.0.6 with PID 31713 (/Users/ritkesh_singh@optum.com/Downloads/pdfprocess/target/classes started by ritkesh_singh@optum.com in /Users/ritkesh_singh@optum.com/Downloads/pdfprocess)
+2025-04-24T12:13:32.883+05:30  INFO 31713 --- [  restartedMain] c.o.d.pdfprocess.PdfProcessApplication   : The following 1 profile is active: "local"
+2025-04-24T12:13:32.898+05:30  INFO 31713 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-04-24T12:13:32.898+05:30  INFO 31713 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-04-24T12:13:33.227+05:30  INFO 31713 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8104 (http)
+2025-04-24T12:13:33.232+05:30  INFO 31713 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-24T12:13:33.232+05:30  INFO 31713 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-04-24T12:13:33.246+05:30  INFO 31713 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-04-24T12:13:33.246+05:30  INFO 31713 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 347 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2025-04-24T12:13:33.266+05:30  WARN 31713 --- [  restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'pdfStorageService': Unsatisfied dependency expressed through field 'pdfRepository': No qualifying bean of type 'com.optum.dms.pdfprocess.Repository.PdfRepository' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+2025-04-24T12:13:33.267+05:30  INFO 31713 --- [  restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-04-24T12:13:33.273+05:30  INFO 31713 --- [  restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
 
-    @Value("${pdf.output.directory}")
-    private String outputDirectory;
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-04-24T12:13:33.279+05:30 ERROR 31713 --- [  restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
 
-    @Value("${process.timeout.seconds}")
-    private long processTimeoutSeconds;
+***************************
+APPLICATION FAILED TO START
+***************************
 
-    @Value("${pdf.useLocal}")
-    private String useLocal;
+Description:
 
-    @Value("${pdf.local.directory}")
-    private String localDirectory;
+Field pdfRepository in com.optum.dms.pdfprocess.Services.PdfStorageService required a bean of type 'com.optum.dms.pdfprocess.Repository.PdfRepository' that could not be found.
 
-    private static final Logger logger = LoggerFactory.getLogger(OcrController.class);
+The injection point has the following annotations:
+	- @org.springframework.beans.factory.annotation.Autowired(required=true)
 
-    @GetMapping("/process-pdf-test-1")
-    public ResponseEntity<Map<String, Object>> processPdfTest(@RequestParam String pdfName) {
-        logger.info("Received request to process PDF: {}", pdfName);
-        try {
-            byte[] pdfBytes = new byte[0];
-            if (Boolean.parseBoolean(useLocal)) {
-                File sourceFile = new File(localDirectory, pdfName);
-                if (!sourceFile.exists()) {
-                    logger.error("Local PDF not found: {}", sourceFile.getAbsolutePath());
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-                logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
-                pdfBytes = Files.readAllBytes(sourceFile.toPath());
-            }
 
-            File inputPdf = File.createTempFile("input", ".pdf");
-            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
-                fos.write(pdfBytes);
-            }
-            logger.info("Saved PDF to temporary file: {}", inputPdf.getAbsolutePath());
+Action:
 
-            File outputPdf = new File(outputDirectory, pdfName.replace(".pdf", "_linearized.pdf"));
-            String ocrMyPdfCommand = String.format("ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 \"%s\" \"%s\"",
-                    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath());
+Consider defining a bean of type 'com.optum.dms.pdfprocess.Repository.PdfRepository' in your configuration.
 
-            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrMyPdfCommand);
-            processBuilder.inheritIO();
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            logger.info("Started ocrmypdf process");
+Disconnected from the target VM, address: '127.0.0.1:55186', transport: 'socket'
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info(line);
-                }
-            }
-
-            boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroy();
-                logger.error("ocrmypdf process timed out");
-                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
-            }
-            if (process.exitValue() != 0) {
-                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            logger.info("ocrmypdf process completed successfully");
-
-            CompletableFuture.runAsync(() -> {
-                try {
-                    uploadToExternalApi(outputPdf);
-                } catch (Exception e) {
-                    logger.error("Async upload to external API failed", e);
-                }
-            });
-
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        } catch (IOException | InterruptedException e) {
-            logger.error("Error processing PDF: {}", pdfName, e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private void uploadToExternalApi(File file) {
-//        String uploadUrl = "https://nuxeodev.optum.com/nuxeo/ui/#!/home";
-        String uploadUrl = "https://nuxeodev.optum.com/nuxeo/api/v1/id/6cd7b9d9-9d1c-4075-a05c-4f8eb01db685";
-        RestTemplate restTemplate = new RestTemplate();
-        FileSystemResource resource = new FileSystemResource(file);
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", resource);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth("dmsjadenx_nprd","prC1Y!ZU3%RU8stQ");
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        try {
-//            ResponseEntity<UploadResponse> response = restTemplate.postForEntity(uploadUrl, requestEntity, UploadResponse.class);
-            ResponseEntity<String> response = restTemplate.exchange(uploadUrl,HttpMethod.PUT, requestEntity, String.class);
-            Pattern pattern = Pattern.compile("URL=([^\"])");
-//            Matcher matcher = pattern.matcher(response.getBody());
-//            if(matcher.find()){
-//                String fullUrl = "https://nuxeodev.optum.com" + matcher.group(1);
-//                logger.info("Uploaded file redirected to :{}",matcher.group(1));
-//                logger.info("full accessible URL might be : {}",fullUrl);
-//            } else{
-//                logger.warn("could not extract redirect path from response");
-//            }
-//
-//            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-////                UploadResponse uploadResponse = response.getBody();
-////                if (uploadResponse.getFileUrl() != null) {
-////                    logger.info("Uploaded PDF available at: {}", uploadResponse.getFileUrl());
-////                } else if (uploadResponse.getPath() != null) {
-////                    logger.info("Uploaded file path: {}", uploadResponse.getPath());
-////                } else {
-////                    logger.info("Upload successful but response lacks file path info.");
-////                }
-//                logger.info("Uploaded file path: {}", response.getBody());
-//
-//            } else {
-//                logger.error("Failed to upload. Status: {}, Body: {}", response.getStatusCode(), response.getBody());
-//            }
-            logger.info("pdf uploaded successfully");
-
-        } catch (Exception e) {
-            logger.error("Exception during upload to external API", e);
-        }
-    }
-
-    @PostMapping("/receive-file")
-    public ResponseEntity<String> receiveFile(@RequestParam("file") MultipartFile file) {
-        try {
-            File destination = new File("/Users/Test/" + file.getOriginalFilename());
-            destination.getParentFile().mkdirs();
-            file.transferTo(destination);
-            logger.info("File saved at: {}", destination.getAbsolutePath());
-            return ResponseEntity.ok("File uploaded successfully.");
-        } catch (IOException e) {
-            logger.error("Failed to save file", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save file");
-        }
-    }
-}
+Process finished with exit code 0
