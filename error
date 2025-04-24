@@ -1,6 +1,11 @@
-com.mongodb.MongoSocketOpenException: Exception opening socket
-        at com.mongodb.internal.connection.SocketStream.lambda$open$0(SocketStream.java:85) ~[mongodb-driver-core-5.2.1.jar:na]
-        at java.base/java.util.Optional.orElseThrow(Optional.java:403) ~[na:na]
-        at com.mongodb.internal.connection.SocketStream.open(SocketStream.java:85) ~[mongodb-driver-core-5.2.1.jar:na]
-        at com.mongodb.internal.connection.InternalStreamConnection.open(InternalStreamConnection.java:233) ~[mongodb-driver-core-5.2.1.jar:na]
-        at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitor.lookupServerDescription(DefaultServerMonitor.java:219) ~[mongodb-driver-core-5.2.1.jar:na]
+package com.optum.dms.pdfprocess.repository;
+
+
+import com.optum.dms.pdfprocess.entity.PdfDocument;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.List;
+public interface PdfRepository extends MongoRepository<PdfDocument, String> {
+
+    List<PdfDocument> findAllByStatus(String Status);
+}
