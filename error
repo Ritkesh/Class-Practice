@@ -9,3 +9,53 @@ public interface PdfRepository extends MongoRepository<PdfDocument, String> {
 
     List<PdfDocument> findAllByStatus(String Status);
 }
+
+
+
+
+
+
+
+
+package com.optum.dms.pdfprocess.service;
+
+import com.optum.dms.pdfprocess.entity.PdfDocument;
+import com.optum.dms.pdfprocess.repository.PdfRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+@Service
+    public class PdfStorageService {
+
+//        @Value("${pdf.upload.path}")
+        private String pdfFilePath = "";
+        @Autowired
+        PdfRepository pdfRepository;
+
+        public String savePdfFromConfiguredPath() throws IOException {
+            File file = new File(pdfFilePath);
+            if (!file.exists()) {
+                throw new IOException("File does not exist at: " + pdfFilePath);
+            }
+
+            PdfDocument document = new PdfDocument();
+            document.setFileName(file.getName());
+            document.setContent(Files.readAllBytes(file.toPath()));
+            return pdfRepository.save(document).getId();
+        }
+
+        public byte[] getPdfById(String id) {
+            return pdfRepository.findById(id)
+                    .map(PdfDocument::getContent)
+                    .orElse(null);
+        }
+        public List<PdfDocument> findAllDocumentByStatus(String st){
+            return pdfRepository.findAllByStatus(st);
+        }
+    }
+
