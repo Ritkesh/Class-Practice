@@ -1,4 +1,2 @@
-Field pdfRepository in com.optum.dms.pdfprocess.Services.PdfStorageService required a bean of type 'com.optum.dms.pdfprocess.Repository.PdfRepository' that could not be found.
-
-The injection point has the following annotations:
-	- @org.springframework.beans.factory.annotation.Autowired(required=true)
+package com.optum.dms.pdfprocess.Repository;
+package com.optum.dms.pdfprocess;
