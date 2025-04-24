@@ -1,0 +1,37 @@
+
+    private void uploadToExternalApi(File file) {
+        String uploadUrl = "https://upload.gofile.io/uploadfile";
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new FileSystemResource(file));
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    uploadUrl, HttpMethod.POST, requestEntity, String.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(response.getBody());
+                JsonNode dataNode = rootNode.path("data");
+
+                if (dataNode.has("downloadPage")) {
+                    String downloadLink = dataNode.get("downloadPage").asText();
+                    logger.info("File uploaded to GoFile. Download link: {}", downloadLink);
+                } else {
+                    logger.warn("Upload response did not contain a download link.");
+                }
+            } else {
+                logger.warn("Failed to upload to GoFile. Status: {}", response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            logger.error("Error uploading to GoFile", e);
+        }
+    }
