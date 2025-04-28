@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +31,9 @@ public class OcrHandler {
     private String username;
     @Value("${external.api.password}")
     private String password;
+    @Value("${pdf.output.directory}")
+    private String outputDirectory;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OcrHandler.class);
 
@@ -106,6 +110,7 @@ public class OcrHandler {
             String batchId = getBatchId();
 
             // Step 2: Upload the file (send raw bytes)
+            saveFileLocally(file);
             uploadFile(batchId, file);
 
             // Step 3: Check upload status (optional)
@@ -136,7 +141,7 @@ public class OcrHandler {
         String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId + "/0";
 
         HttpHeaders headers = createAuthHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentType(MediaType.APPLICATION_PDF);
 
         byte[] fileBytes = Files.readAllBytes(file.toPath());
 
@@ -192,6 +197,15 @@ public class OcrHandler {
     private String encodeCredentials(String username, String password) {
         String credentials = username + ":" + password;
         return Base64.getEncoder().encodeToString(credentials.getBytes());
+    }
+
+    private void saveFileLocally(File file) throws IOException{
+        File directory = new File(outputDirectory);
+        if(!directory.exists()){
+            directory.mkdirs();
+        }
+        File localFile = new File(directory,file.getName());
+        Files.copy(file.toPath(),localFile.toPath());
     }
 
 
