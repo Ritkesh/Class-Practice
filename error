@@ -1,34 +1,13 @@
- private void createDocument(String path, String batchId, String fileName) {
-        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
-        HttpHeaders headers = createAuthHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        String requestBody = "{\n" +
-                "  \"entity-type\": \"document\",\n" +
-                "  \"name\": \"" + fileName + "\",\n" +
-                "  \"type\": \"File\",\n" +
-                "  \"properties\": {\n" +
-                "    \"dc:title\": \"" + fileName + "\"\n" +
-                "  },\n" +
-                "  \"contextParameters\": {\n" +
-                "    \"upload-batch\": {\n" +
-                "      \"batchId\": \"" + batchId + "\",\n" +
-                "      \"fileIdx\": 0\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        RestTemplate restTemplate = new RestTemplate();
-//
-//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-//        System.out.println("");
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
-
-        System.out.println("Upload response: " + response.getBody());
+  "entity-type": "document",
+  "name": "output618695450588501866.pdf",
+  "type": "File",
+  "properties": {
+    "dc:title": "output618695450588501866.pdf"
+  },
+  "file:content": {
+    "upload-batch": {
+batchId-03964f5e-702d-4620-8316-e84f277377d2",
+      "upload-fileId": 0
     }
+  }
+}
