@@ -1,3 +1,18 @@
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+
+public class OcrHandler {
+
+    private String username = "your-username"; // Set your username
+    private String password = "your-password"; // Set your password
 
     public void uploadToExternalApi(File file, String path) {
         try {
@@ -22,25 +37,29 @@
         HttpHeaders headers = createAuthHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // POST request to get the BatchId
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-        // Extract BatchId from the response (Assuming it's in the response body)
+
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode node = objectMapper.readTree(response.getBody());
-        return node.path("batchId").asText(); // Assuming the response contains the BatchId directly
+        return node.path("batchId").asText();
     }
 
     private void uploadFile(String batchId, File file) {
         String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId + "/0";
         HttpHeaders headers = createAuthHeaders();
-        headers.set("Content-Type", "multipart/form-data");
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        // Assuming we are uploading as form-data
-        HttpEntity<File> entity = new HttpEntity<>(file, headers);
+        // ✅ Correct: use FileSystemResource
+        FileSystemResource fileResource = new FileSystemResource(file);
+
+        // ✅ Correct: use MultiValueMap
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileResource); // Use the correct key (usually "file")
+
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+
         RestTemplate restTemplate = new RestTemplate();
-
-        // POST request to upload the file
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 
@@ -49,7 +68,6 @@
         HttpHeaders headers = createAuthHeaders();
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // GET request to check upload status
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
     }
@@ -57,14 +75,13 @@
     private void createDocument(String path, String batchId) {
         String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
         HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Here you may need to construct the request body (probably JSON) depending on the API
+        // Constructing the JSON request body
         String requestBody = "{ \"batchId\": \"" + batchId + "\" }";
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        // POST request to create the document
         RestTemplate restTemplate = new RestTemplate();
-
         restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
     }
 
@@ -76,5 +93,6 @@
 
     private String encodeCredentials(String username, String password) {
         String credentials = username + ":" + password;
-        return new String(java.util.Base64.getEncoder().encode(credentials.getBytes()));
+        return java.util.Base64.getEncoder().encodeToString(credentials.getBytes());
     }
+}
