@@ -1,62 +1,78 @@
-    public void processPdfTest(PdfDocument pdfDocument) {
-        String pdfName = "input.pdf";
-        logger.info("Received request to process PDF: {}", pdfName);
 
-        try {
-            byte[] pdfBytes = new byte[0];
-            if (Boolean.parseBoolean(useLocal)) {
-                File sourceFile = new File(localDirectory, pdfName);
-                if (!sourceFile.exists()) {
-                    logger.error("Local PDF not found: {}", sourceFile.getAbsolutePath());
-                    return;
-                }
-                logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
-                pdfBytes = Files.readAllBytes(sourceFile.toPath());
+        public void uploadToExternalApi(File file, String path) {
+            try {
+                // Step 1: Get the batch ID from the first API
+                String batchId = getBatchId();
+
+                // Step 2: Upload the file
+                uploadFile(batchId, file);
+
+                // Step 3: Check the upload status (Optional, can be used for monitoring)
+                checkUploadStatus(batchId);
+
+                // Step 4: Create the document in the specified path
+                createDocument(path, batchId);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            // Save input PDF to temp file
-            File inputPdf = File.createTempFile("input", ".pdf");
-            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
-                fos.write(pdfBytes);
-            }
-            File outputPdf = File.createTempFile("output", ".pdf");
-
-            String ocrCommand = String.format(
-                    "ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 \"%s\" \"%s\"",
-                    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
-            );
-
-            logger.info("Executing ocrmypdf command: {}", ocrCommand);
-
-            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrCommand);
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info(line);
-                }
-            }
-
-            // Wait for process to complete
-            boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroy();
-                logger.error("ocrmypdf process timed out");
-                return;
-            }
-
-            if (process.exitValue() != 0) {
-                logger.error("ocrmypdf process failed with exit code {}", process.exitValue());
-                return;
-            }
-
-            logger.info("ocrmypdf process completed successfully. Uploading...");
-
-            // Upload the final output file
-            uploadToExternalApi(outputPdf);
-
-        } catch (IOException | InterruptedException e) {
-            logger.error("Error processing PDF: {}", pdfName, e);
         }
-    }
+
+        private String getBatchId() {
+            String url = "https://nuxeodev.optum.com/nuxeo/api/upload";
+            HttpHeaders headers = createAuthHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            // POST request to get the BatchId
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            // Extract BatchId from the response (Assuming it's in the response body)
+            return response.getBody(); // Assuming the response contains the BatchId directly
+        }
+
+        private void uploadFile(String batchId, File file) {
+            String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId + "/0";
+            HttpHeaders headers = createAuthHeaders();
+            headers.set("Content-Type", "multipart/form-data");
+
+            // Assuming we are uploading as form-data
+            HttpEntity<File> entity = new HttpEntity<>(file, headers);
+            RestTemplate restTemplate = new RestTemplate();
+
+            // POST request to upload the file
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        }
+
+        private void checkUploadStatus(String batchId) {
+            String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId;
+            HttpHeaders headers = createAuthHeaders();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            // GET request to check upload status
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        }
+
+        private void createDocument(String path, String batchId) {
+            String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
+            HttpHeaders headers = createAuthHeaders();
+
+            // Here you may need to construct the request body (probably JSON) depending on the API
+            String requestBody = "{ \"batchId\": \"" + batchId + "\" }";
+            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+            // POST request to create the document
+            RestTemplate restTemplate = new RestTemplate();
+
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        }
+
+        private HttpHeaders createAuthHeaders() {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Basic " + encodeCredentials(username, password));
+            return headers;
+        }
+
+        private String encodeCredentials(String username, String password) {
+            String credentials = username + ":" + password;
+            return new String(java.util.Base64.getEncoder().encode(credentials.getBytes()));
+        }
