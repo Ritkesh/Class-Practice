@@ -1,1 +1,128 @@
-org.springframework.web.client.HttpClientErrorException$Unauthorized: 401  on POST request for "https://nuxeodev.optum.com/nuxeo/api/v1/upload/batchId-91c27be4-df72-48fb-8a6a-475da372a219/0": [no body]
+{
+	"entity-type": "document", 
+	"name":"output1934717203166339437.pdf", 
+	"type": "File",
+	"properties": {
+		"dc:title": "output1934717203166339437.pdf", 
+		"dc:description": "Created via a so cool and simple REST API", 
+		"file:content": {
+			"upload-batch":"{{BatchId}}",
+			"upload-fileId":"0"
+		} 
+	} 
+}
+
+
+
+
+
+
+
+
+{
+    "entity-type": "document",
+    "repository": "default",
+    "uid": "a1b44eeb-6795-4b3f-afc1-ccd77d872b83",
+    "path": "/MPA/test/output193471720316633943.1745844966574",
+    "type": "File",
+    "state": "project",
+    "parentRef": "fa47976e-418b-4333-a4ea-fcb5b7639f55",
+    "isCheckedOut": true,
+    "isRecord": false,
+    "retainUntil": null,
+    "hasLegalHold": false,
+    "isUnderRetentionOrLegalHold": false,
+    "isVersion": false,
+    "isProxy": false,
+    "changeToken": "0-0",
+    "isTrashed": false,
+    "title": "output1934717203166339437.pdf",
+    "lastModified": "2025-04-28T12:56:06.574Z",
+    "properties": {
+        "uid:uid": null,
+        "uid:major_version": 0,
+        "uid:minor_version": 0,
+        "thumb:thumbnail": null,
+        "file:content": {
+            "name": "output1934717203166339437.pdf",
+            "mime-type": "application/pdf",
+            "encoding": null,
+            "digestAlgorithm": "MD5",
+            "digest": "ac548dd6668464fbd472ff586e3cb640",
+            "length": "249638",
+            "data": "https://nuxeodev.optum.com/nuxeo/nxfile/default/a1b44eeb-6795-4b3f-afc1-ccd77d872b83/file:content/output1934717203166339437.pdf?changeToken=0-0",
+            "blobUrl": "https://nuxeodev.optum.com/nuxeo/nxfile/default/a1b44eeb-6795-4b3f-afc1-ccd77d872b83/file:content/output1934717203166339437.pdf?changeToken=0-0"
+        },
+        "common:icon-expanded": null,
+        "common:icon": "/icons/pdf.png",
+        "files:files": [],
+        "dc:description": "Created via a so cool and simple REST API",
+        "dc:language": null,
+        "dc:coverage": null,
+        "dc:valid": null,
+        "dc:creator": "dmsjadenx_nprd",
+        "dc:modified": "2025-04-28T12:56:06.574Z",
+        "dc:lastContributor": "dmsjadenx_nprd",
+        "dc:rights": null,
+        "dc:expired": null,
+        "dc:format": null,
+        "dc:created": "2025-04-28T12:56:06.574Z",
+        "dc:title": "output1934717203166339437.pdf",
+        "dc:issued": null,
+        "dc:nature": null,
+        "dc:subjects": [],
+        "dc:contributors": [
+            "dmsjadenx_nprd"
+        ],
+        "dc:source": null,
+        "dc:publisher": null,
+        "relatedtext:relatedtextresources": [],
+        "nxtag:tags": []
+    },
+    "facets": [
+        "Versionable",
+        "NXTag",
+        "Publishable",
+        "Commentable",
+        "HasRelatedText",
+        "Thumbnail"
+    ],
+    "schemas": [
+        {
+            "name": "file_schema",
+            "prefix": "file_schema"
+        },
+        {
+            "name": "uid",
+            "prefix": "uid"
+        },
+        {
+            "name": "thumbnail",
+            "prefix": "thumb"
+        },
+        {
+            "name": "file",
+            "prefix": "file"
+        },
+        {
+            "name": "common",
+            "prefix": "common"
+        },
+        {
+            "name": "files",
+            "prefix": "files"
+        },
+        {
+            "name": "dublincore",
+            "prefix": "dc"
+        },
+        {
+            "name": "relatedtext",
+            "prefix": "relatedtext"
+        },
+        {
+            "name": "facetedTag",
+            "prefix": "nxtag"
+        }
+    ]
+}
