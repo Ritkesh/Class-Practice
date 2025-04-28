@@ -1,0 +1,1094 @@
+{
+	"info": {
+		"_postman_id": "86546b3b-8bac-403e-bc9c-796d832bf3d4",
+		"name": "Nuxeo REST API (Create, Search, Retrieve)",
+		"description": "Basic examples of Nuxeo REST API calls",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a document with content (no chunks)",
+			"item": [
+				{
+					"name": "1 - Batch Initialization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"BatchId\",jsonData.batchId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload"
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#batch-initialization"
+					},
+					"response": []
+				},
+				{
+					"name": "2 - Uploading a File in One Go (not Resumable)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-File-Name",
+								"value": "For Sale.docx",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "For Sale.docx"
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}/0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}",
+								"0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}/0\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#uploading-a-file-in-one-go-not-resumable"
+					},
+					"response": []
+				},
+				{
+					"name": "3 - Check BatchID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}"
+							]
+						},
+						"description": "GET https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#batch-file-verification"
+					},
+					"response": []
+				},
+				{
+					"name": "4 - Create a document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"type": "text",
+								"value": "3"
+							},
+							{
+								"key": "X-NXproperties",
+								"type": "text",
+								"value": "*"
+							},
+							{
+								"key": "X-NXRepository",
+								"type": "text",
+								"value": "default"
+							},
+							{
+								"key": "content-type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"entity-type\": \"document\", \n\t\"name\":\"For Sale.docx\", \n\t\"type\": \"File\",\n\t\"properties\": {\n\t\t\"dc:title\": \"For Sale.docx\", \n\t\t\"dc:description\": \"Created via a so cool and simple REST API\", \n\t\t\"file:content\": {\n\t\t\t\"upload-batch\":\"{{BatchId}}\",\n\t\t\t\"upload-fileId\":\"0\"\n\t\t} \n\t} \n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{path}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{path}}"
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/path/{path}?\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#creating-a-document-from-an-uploaded-file\nhttps://doc.nuxeo.com/nxdoc/rest-api-entity-types/#document"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Create a document with content (with chunks)",
+			"item": [
+				{
+					"name": "1 - Batch Initialization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"BatchId\",jsonData.batchId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload"
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#batch-initialization"
+					},
+					"response": []
+				},
+				{
+					"name": "2a - Uploading a File in Chunks (Resumable) - chunk0",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-File-Name",
+								"type": "text",
+								"value": "USA_latest.pdf"
+							},
+							{
+								"key": "X-Upload-Type",
+								"value": "chunked",
+								"type": "text"
+							},
+							{
+								"key": "X-Upload-Chunk-Index",
+								"value": "0",
+								"type": "text"
+							},
+							{
+								"key": "X-Upload-Chunk-Count",
+								"value": "4",
+								"type": "text"
+							},
+							{
+								"key": "X-File-Size",
+								"value": "3378090",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "xaa"
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}/0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}",
+								"0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}/0\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#uploading-a-file-in-chunks-resumable\n\nUsed large pdf file example (3MB): https://www.nhc.noaa.gov/tafb_latest/USA_latest.pdf\nsplit: split -b 1m USA_latest.pdf"
+					},
+					"response": []
+				},
+				{
+					"name": "2b - Uploading a File in Chunks (Resumable) - chunk1",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-File-Name",
+								"type": "text",
+								"value": "USA_latest.pdf"
+							},
+							{
+								"key": "X-Upload-Type",
+								"type": "text",
+								"value": "chunked"
+							},
+							{
+								"key": "X-Upload-Chunk-Index",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "X-Upload-Chunk-Count",
+								"type": "text",
+								"value": "4"
+							},
+							{
+								"key": "X-File-Size",
+								"type": "text",
+								"value": "3378090"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "xab"
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}/0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}",
+								"0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}/0\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#uploading-a-file-in-chunks-resumable\n\nUsed large pdf file example (3MB): https://www.nhc.noaa.gov/tafb_latest/USA_latest.pdf\nsplit: split -b 1m USA_latest.pdf"
+					},
+					"response": []
+				},
+				{
+					"name": "2c - Uploading a File in Chunks (Resumable) - chunk2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-File-Name",
+								"type": "text",
+								"value": "USA_latest.pdf"
+							},
+							{
+								"key": "X-Upload-Type",
+								"type": "text",
+								"value": "chunked"
+							},
+							{
+								"key": "X-Upload-Chunk-Index",
+								"type": "text",
+								"value": "2"
+							},
+							{
+								"key": "X-Upload-Chunk-Count",
+								"type": "text",
+								"value": "4"
+							},
+							{
+								"key": "X-File-Size",
+								"type": "text",
+								"value": "3378090"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "xac"
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}/0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}",
+								"0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}/0\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#uploading-a-file-in-chunks-resumable\n\nUsed large pdf file example (3MB): https://www.nhc.noaa.gov/tafb_latest/USA_latest.pdf\nsplit: split -b 1m USA_latest.pdf"
+					},
+					"response": []
+				},
+				{
+					"name": "2d - Uploading a File in Chunks (Resumable) - chunk3",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-File-Name",
+								"type": "text",
+								"value": "USA_latest.pdf"
+							},
+							{
+								"key": "X-Upload-Type",
+								"type": "text",
+								"value": "chunked"
+							},
+							{
+								"key": "X-Upload-Chunk-Index",
+								"type": "text",
+								"value": "3"
+							},
+							{
+								"key": "X-Upload-Chunk-Count",
+								"type": "text",
+								"value": "4"
+							},
+							{
+								"key": "X-File-Size",
+								"type": "text",
+								"value": "3378090"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "xad"
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}/0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}",
+								"0"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}/0\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#uploading-a-file-in-chunks-resumable\n\nUsed large pdf file example (3MB): https://www.nhc.noaa.gov/tafb_latest/USA_latest.pdf\nsplit: split -b 1m USA_latest.pdf"
+					},
+					"response": []
+				},
+				{
+					"name": "3 - Check BatchID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upload/{{BatchId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"upload",
+								"{{BatchId}}"
+							]
+						},
+						"description": "GET https://nuxeodev.optum.com/nuxeo/api/v1/upload/{BatchId}\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#batch-file-verification"
+					},
+					"response": []
+				},
+				{
+					"name": "4 - Create a document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"entity-type\": \"document\", \n\t\"name\":\"USA_latest.pdf\", \n\t\"type\": \"File\",\n\t\"properties\": {\n\t\t\"dc:title\": \"USA_latest.pdf\", \n\t\t\"dc:description\": \"Large file uploaded in chunks\", \n\t\t\"file:content\": {\n\t\t\t\"upload-batch\":\"{{BatchId}}\",\n\t\t\t\"upload-fileId\":\"0\"\n\t\t} \n\t} \n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{path}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{path}}"
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/path/{path}?\n\nReference:\nhttps://doc.nuxeo.com/nxdoc/howto-upload-file-nuxeo-using-rest-api/#creating-a-document-from-an-uploaded-file\nhttps://doc.nuxeo.com/nxdoc/rest-api-entity-types/#document"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Document Object",
+			"item": [
+				{
+					"name": "Get a document object by path",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"docId\",jsonData.uid);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{path}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{path}}"
+							]
+						},
+						"description": "Get a document object by path\n\nGET /api/v1/path/{docPath}\n\nAPI Playground: https://nuxeodev.optum.com/nuxeo/playground/#/resources/path/0/GET\n\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Get a document object by path Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.collectionVariables.set(\"docId\",jsonData.uid);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{path}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{path}}"
+							]
+						},
+						"description": "Get a document object by path\n\nGET /api/v1/path/{docPath}\n\nAPI Playground: https://nuxeodev.optum.com/nuxeo/playground/#/resources/path/0/GET\n\n"
+					},
+					"response": []
+				},
+				{
+					"name": "Get a document object by id - (docId of object by path)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/id/{{docId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"id",
+								"{{docId}}"
+							]
+						},
+						"description": "Get a document object by id\n\nGET /api/v1/id/{docId}\n\nAPI Playground:\nhttps://nuxeodev.optum.com/nuxeo/playground/#/resources/id/0/GET"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Document Children",
+			"item": [
+				{
+					"name": "Get the children of a document/folder - root",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "X-NXVoidOperation",
+								"value": "false",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"params\":{},\"input\":\"/\",\"context\":{}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/site/automation/Document.GetChildren",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"site",
+								"automation",
+								"Document.GetChildren"
+							]
+						},
+						"description": "Get the children of a document.\n\nPOST /site/automation/Document.GetChildren - root\n\nAPI Playground:\nhttps://nuxeodev.optum.com/nuxeo/playground/#/commands/Document.GetChildren"
+					},
+					"response": []
+				},
+				{
+					"name": "Get the children of a document. - {{path}}",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "X-NXVoidOperation",
+								"value": "false",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"params\":{},\"input\":\"/{{path}}/\",\"context\":{}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/site/automation/Document.GetChildren",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"site",
+								"automation",
+								"Document.GetChildren"
+							]
+						},
+						"description": "Get the children of a document.\n\nPOST /site/automation/Document.GetChildren\n\nAPI Playground:\nhttps://nuxeodev.optum.com/nuxeo/playground/#/commands/Document.GetChildren"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Document Search",
+			"item": [
+				{
+					"name": "Search - WHERE ecm:path STARTSWITH '/{{path}}'",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/search/lang/NXQL/execute?query=SELECT * FROM Document WHERE ecm:path STARTSWITH '/{{path}}'",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search",
+								"lang",
+								"NXQL",
+								"execute"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "SELECT * FROM Document WHERE ecm:path STARTSWITH '/{{path}}'"
+								}
+							]
+						},
+						"description": "References:\nhttps://doc.nuxeo.com/nxdoc/search-endpoints/\nhttps://doc.nuxeo.com/nxdoc/nxql/"
+					},
+					"response": []
+				},
+				{
+					"name": "Search -  WHERE ecm:name = 'USA_latest.pdf' AND ecm:path STARTSWITH '/{{path}}'",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/search/lang/NXQL/execute?query=SELECT * FROM Document WHERE ecm:name = 'USA_latest.pdf' AND ecm:path STARTSWITH '/{{path}}'",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"search",
+								"lang",
+								"NXQL",
+								"execute"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "SELECT * FROM Document WHERE ecm:name = 'USA_latest.pdf' AND ecm:path STARTSWITH '/{{path}}'"
+								}
+							]
+						},
+						"description": "References:\nhttps://doc.nuxeo.com/nxdoc/search-endpoints/\nhttps://doc.nuxeo.com/nxdoc/nxql/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Create a Folder",
+			"item": [
+				{
+					"name": "Create folder by path",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Nuxeo-Transaction-Timeout",
+								"value": "3",
+								"type": "text"
+							},
+							{
+								"key": "X-NXproperties",
+								"value": "*",
+								"type": "text"
+							},
+							{
+								"key": "X-NXRepository",
+								"value": "default",
+								"type": "text"
+							},
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"entity-type\": \"document\", \n\t\"name\":\"Encounters\", \n\t\"type\": \"Folder\",\n\t\"properties\": {\n\t\t\"dc:title\": \"Encounters\"\n\t}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{domainPath}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{domainPath}}"
+							]
+						},
+						"description": "POST https://nuxeodev.optum.com/nuxeo/api/v1/path/{path}?"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Document Retrieval",
+			"item": [
+				{
+					"name": "Get document content by path",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/path/{{path}}/USA_latest.pdf/@blob/file:content",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"path",
+								"{{path}}",
+								"USA_latest.pdf",
+								"@blob",
+								"file:content"
+							]
+						},
+						"description": "GET /api/v1/path/{path}/@blob/file:content"
+					},
+					"response": [
+						{
+							"name": "Get document content by path - PDF",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://nuxeodev.optum.com/nuxeo/api/v1/path/MPA/Contact_Confirmation/194872Alt1.pdf/@blob/file:content",
+									"protocol": "https",
+									"host": [
+										"nuxeodev",
+										"optum",
+										"com"
+									],
+									"path": [
+										"nuxeo",
+										"api",
+										"v1",
+										"path",
+										"MPA",
+										"Contact_Confirmation",
+										"194872Alt1.pdf",
+										"@blob",
+										"file:content"
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "l@n@dm1n",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Username",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "Password",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "BatchId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "path",
+			"value": "default-domain/workspaces/test",
+			"type": "string"
+		},
+		{
+			"key": "docId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "domainPath",
+			"value": "default-domain/workspaces/test",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "https://nuxeodev.optum.com/nuxeo",
+			"type": "default"
+		}
+	]
+}
