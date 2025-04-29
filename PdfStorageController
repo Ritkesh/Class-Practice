@@ -1,6 +1,6 @@
-package com.example.OcrMyPdf.controller;
+package com.optum.dms.pdfprocess.controller;
 
-import com.example.OcrMyPdf.Sevices.PdfStorageService;
+import com.optum.dms.pdfprocess.Services.PdfStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,4 +38,3 @@ public class PdfStorageController {
         }
     }
 }
-
