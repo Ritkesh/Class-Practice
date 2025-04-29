@@ -1,37 +1,109 @@
+public class FileContent {
+    private String uploadBatch;
+    private String uploadFileId;
 
-    private void createDocument(String path, String batchId, File file) {
-        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
-        HttpHeaders headers = createAuthHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-NXproperties","*");
-        headers.set("X-NXRepository","default");
-        String requestBody = "{\n" +
-                "  \"entity-type\": \"document\",\n" +
-                "  \"name\": \"" + file.getName() + "\",\n" +
-                "  \"type\": \"File\",\n" +
-                "  \"properties\": {\n" +
-                "    \"dc:title\": \"" + file.getName() + "\"\n" +
-                "  ,\n" +
-                "  \"file:content\": {\n" +
-                "    \"upload-batch\":\""  +batchId + "\",\n" +
-                "      \"upload-fileId\": \"0\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-        System.out.println("request body for create document:" + requestBody);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        RestTemplate restTemplate = new RestTemplate();
-//
-//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-//        System.out.println("");
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
-
-        System.out.println("Upload response: " + response.getBody());
-        System.out.println("Status :" +response.getStatusCode());
+    // Constructors, Getters and Setters
+    public FileContent() {}
+    public FileContent(String uploadBatch, String uploadFileId) {
+        this.uploadBatch = uploadBatch;
+        this.uploadFileId = uploadFileId;
     }
+    public String getUploadBatch() {
+        return uploadBatch;
+    }
+    public void setUploadBatch(String uploadBatch) {
+        this.uploadBatch = uploadBatch;
+    }
+    public String getUploadFileId() {
+        return uploadFileId;
+    }
+    public void setUploadFileId(String uploadFileId) {
+        this.uploadFileId = uploadFileId;
+    }
+}
+
+
+
+public class Properties {
+    private String dcTitle;
+    private FileContent fileContent;
+
+    // Constructors, Getters and Setters
+    public Properties() {}
+    public Properties(String dcTitle, FileContent fileContent) {
+        this.dcTitle = dcTitle;
+        this.fileContent = fileContent;
+    }
+
+    public String getDcTitle() {
+        return dcTitle;
+    }
+
+    public void setDcTitle(String dcTitle) {
+        this.dcTitle = dcTitle;
+    }
+
+    public FileContent getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(FileContent fileContent) {
+        this.fileContent = fileContent;
+    }
+}
+
+
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class DocumentRequest {
+    @JsonProperty("entity-type")
+    private String entityType;
+    private String name;
+    private String type;
+    private Properties properties;
+
+    // Constructors, Getters and Setters
+    public DocumentRequest() {}
+
+    public DocumentRequest(String entityType, String name, String type, Properties properties) {
+        this.entityType = entityType;
+        this.name = name;
+        this.type = type;
+        this.properties = properties;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+}
+
