@@ -1,9 +1,15 @@
-package com.example.OcrMyPdf.service;
-
-import com.example.OcrMyPdf.entity.PdfDocument;
+package com.optum.dms.pdfprocess.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.optum.dms.pdfprocess.entity.Document;
+import com.optum.dms.pdfprocess.entity.FileContent;
+import com.optum.dms.pdfprocess.entity.FileProperties;
+import com.optum.dms.pdfprocess.entity.PdfDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,24 +19,30 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class OcrHandler {
-
     @Value("${pdf.useLocal}")
     private String useLocal;
-
     @Value("${process.timeout.seconds}")
     private long processTimeoutSeconds;
-
     @Value("${pdf.local.directory}")
     private String localDirectory;
+    @Value("${external.api.username}")
+    private String username;
+    @Value("${external.api.password}")
+    private String password;
+    @Value("${pdf.output.directory}")
+    private String outputDirectory;
+
 
     private static final Logger logger = LoggerFactory.getLogger(OcrHandler.class);
 
+
     public void processPdfTest(PdfDocument pdfDocument) {
-        String pdfName = "input.pdf";
+        String pdfName = "ED1.pdf";
         logger.info("Received request to process PDF: {}", pdfName);
 
         try {
@@ -44,24 +56,15 @@ public class OcrHandler {
                 logger.info("Loading PDF from local path: {}", sourceFile.getAbsolutePath());
                 pdfBytes = Files.readAllBytes(sourceFile.toPath());
             }
-
-            // Save input PDF to temp file
             File inputPdf = File.createTempFile("input", ".pdf");
             try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
                 fos.write(pdfBytes);
             }
-
-            // Create temp file for ocrmypdf output
             File outputPdf = File.createTempFile("output", ".pdf");
 
-            // Convert to WSL paths
-            String wslInputPath = toWslPath(inputPdf.getAbsolutePath());
-            String wslOutputPath = toWslPath(outputPdf.getAbsolutePath());
-
-            // Command to run OCR
             String ocrCommand = String.format(
                     "ocrmypdf --skip-text --rotate-pages --deskew --jobs 4 \"%s\" \"%s\"",
-                    wslInputPath, wslOutputPath
+                    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
             );
 
             logger.info("Executing ocrmypdf command: {}", ocrCommand);
@@ -69,16 +72,12 @@ public class OcrHandler {
             ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrCommand);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-
-            // Log OCR output
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     logger.info(line);
                 }
             }
-
-            // Wait for process to complete
             boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroy();
@@ -92,14 +91,224 @@ public class OcrHandler {
             }
 
             logger.info("ocrmypdf process completed successfully. Uploading...");
-
-            // Upload the final output file
-            uploadToExternalApi(outputPdf);
+            uploadToExternalApi(outputPdf,"MPA/test");
 
         } catch (IOException | InterruptedException e) {
             logger.error("Error processing PDF: {}", pdfName, e);
         }
     }
+
+
+
+
+    public void uploadToExternalApi(File file, String path) {
+        try {
+            String batchId = getBatchId();
+             File file1 = uploadFile(batchId, file);
+            saveFileLocally(file1);
+            checkUploadStatus(batchId);
+            createDocument(path, batchId, file);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getBatchId() throws JsonProcessingException {
+        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload";
+        HttpHeaders headers = createAuthHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode node = objectMapper.readTree(response.getBody());
+        System.out.println("BatchId:" + node.path("batchId").asText());
+        return node.path("batchId").asText();
+    }
+
+//    private void uploadFile(String batchId, File file) throws IOException {
+//        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId + "/0";
+//
+//        HttpHeaders headers = createAuthHeaders();
+//        headers.setContentType(MediaType.APPLICATION_PDF);
+//        logger.info("UplOADING FILE Path :" +file.getAbsolutePath());
+//        logger.info("File Size :"+file.length());
+//
+//        byte[] fileBytes = Files.readAllBytes(file.toPath());
+//
+//        HttpEntity<byte[]> entity = new HttpEntity<>(fileBytes, headers);
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//
+//
+//
+////        RestTemplate restTemplate = new RestTemplate();
+////        FileSystemResource resource = new FileSystemResource(file);
+////
+////        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+////        body.add("file", resource);
+////
+////        HttpHeaders headers = createAuthHeaders();
+////        headers.setContentType(MediaType.APPLICATION_PDF);
+////
+////        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+////
+////        try {
+////            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+////            logger.info("PDF uploaded successfully. Response: {}", response.getBody());
+////        } catch (Exception e) {
+////            logger.error("Exception during upload to external API", e);
+////        }
+//
+//
+//    }
+
+
+
+    public File uploadFile(String batchId, File file) throws IOException {
+        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId + "/0";
+
+        HttpHeaders headers = createAuthHeaders();
+        headers.set("cookie","SERVERID=nuxeodev_s1|aA+XR|aA+Wb");
+//        application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.set("X-Upload-Type","normal");
+        headers.set("X-File-Name",file.getName());
+
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
+//        byte[] fileBytes = new byte[01000001];
+//        ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+//            @Override
+//            public String getFilename() {
+//                return "file.pdf"; // Provide a filename here
+//            }
+//        };
+
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<?> requestEntity = new HttpEntity<>(fileBytes, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        );
+
+        System.out.println("upload request:" + requestEntity.getBody());
+
+        System.out.println("Upload response: " + response.getBody());
+        System.out.println("Status:" + response.getStatusCode());
+        File fl=  File.createTempFile("Test",".pdf");
+        try (FileOutputStream fos = new FileOutputStream(fl)) {
+            fos.write(fileBytes);
+        }
+       return fl;
+    }
+
+
+
+    private void checkUploadStatus(String batchId) {
+        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/upload/" + batchId;
+        HttpHeaders headers = createAuthHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+    }
+
+    private void createDocument(String path, String batchId, File file) {
+        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NXproperties","*");
+        headers.set("X-NXRepository","default");
+//        String requestBody = "{\n" +
+//                "  \"entity-type\": \"document\",\n" +
+//                "  \"name\": \"" + file.getName() + "\",\n" +
+//                "  \"type\": \"File\",\n" +
+//                "  \"properties\": {\n" +
+//                "    \"dc:title\": \"" + file.getName() + "\"\n" +
+//                "  ,\n" +
+//                "  \"file:content\": {\n" +
+//                "    \"upload-batch\":\""  +batchId + "\",\n" +
+//                "      \"upload-fileId\": \"0\"\n" +
+//                "    }\n" +
+//                "  }\n" +
+//                "}";
+//
+//        System.out.println("request body for create document:" + requestBody);
+
+        FileContent fileContent = new FileContent(batchId,"0");
+        FileProperties fileProperties = new FileProperties(file.getName(), fileContent);
+        Document request = new Document("document", file.getName(), "File",fileProperties);
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            String requestBd = mapper.writeValueAsString(request);
+            System.out.println("new request body for create document:" + requestBd);
+            HttpEntity<String> entity = new HttpEntity<>(requestBd, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            System.out.println("Upload response: " + response.getBody());
+            System.out.println("Status :" +response.getStatusCode());
+
+        } catch (JsonProcessingException e) {
+            logger.error("error",e.getMessage());
+        }
+//        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//        System.out.println("");
+//
+//        ResponseEntity<String> response = restTemplate.exchange(
+//                url,
+//                HttpMethod.POST,
+//                entity,
+//                String.class
+//        );
+//
+//        System.out.println("Upload response: " + response.getBody());
+//        System.out.println("Status :" +response.getStatusCode());
+    }
+
+
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic " + encodeCredentials(username, password));
+        headers.set("X-Upload-Type", "normal"); // Important for Nuxeo
+        return headers;
+    }
+
+    private String encodeCredentials(String username, String password) {
+        String credentials = username + ":" + password;
+        return Base64.getEncoder().encodeToString(credentials.getBytes());
+    }
+
+    private void saveFileLocally(File file) throws IOException{
+        File directory = new File(outputDirectory);
+        if(!directory.exists()){
+            directory.mkdirs();
+        }
+        File localFile = new File(directory,file.getName());
+        Files.copy(file.toPath(),localFile.toPath());
+    }
+
+
+
+
+
+
+
 
     private void uploadToExternalApi(File file) {
         String uploadUrl = "https://upload.gofile.io/uploadfile";
@@ -123,10 +332,6 @@ public class OcrHandler {
         }
     }
 
-    private String toWslPath(String windowsPath) {
-        return windowsPath
-                .replace("C:\\", "/mnt/c/")
-                .replace("D:\\", "/mnt/d/")
-                .replace("\\", "/");
-    }
+
+
 }
