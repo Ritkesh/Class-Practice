@@ -1,109 +1,64 @@
-public class FileContent {
-    private String uploadBatch;
-    private String uploadFileId;
-
-    // Constructors, Getters and Setters
-    public FileContent() {}
-    public FileContent(String uploadBatch, String uploadFileId) {
-        this.uploadBatch = uploadBatch;
-        this.uploadFileId = uploadFileId;
-    }
-    public String getUploadBatch() {
-        return uploadBatch;
-    }
-    public void setUploadBatch(String uploadBatch) {
-        this.uploadBatch = uploadBatch;
-    }
-    public String getUploadFileId() {
-        return uploadFileId;
-    }
-    public void setUploadFileId(String uploadFileId) {
-        this.uploadFileId = uploadFileId;
-    }
-}
-
-
-
-public class Properties {
-    private String dcTitle;
-    private FileContent fileContent;
-
-    // Constructors, Getters and Setters
-    public Properties() {}
-    public Properties(String dcTitle, FileContent fileContent) {
-        this.dcTitle = dcTitle;
-        this.fileContent = fileContent;
-    }
-
-    public String getDcTitle() {
-        return dcTitle;
-    }
-
-    public void setDcTitle(String dcTitle) {
-        this.dcTitle = dcTitle;
-    }
-
-    public FileContent getFileContent() {
-        return fileContent;
-    }
-
-    public void setFileContent(FileContent fileContent) {
-        this.fileContent = fileContent;
-    }
-}
-
-
-
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class DocumentRequest {
-    @JsonProperty("entity-type")
-    private String entityType;
-    private String name;
-    private String type;
-    private Properties properties;
-
-    // Constructors, Getters and Setters
-    public DocumentRequest() {}
-
-    public DocumentRequest(String entityType, String name, String type, Properties properties) {
-        this.entityType = entityType;
-        this.name = name;
-        this.type = type;
-        this.properties = properties;
-    }
-
-    public String getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-}
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 pdfprocess % mvn clean install
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.optum.dms:pdf-process >----------------------
+[INFO] Building Pdf process 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ pdf-process ---
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ pdf-process ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ pdf-process ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 10 source files with javac [debug parameters release 17] to target/classes
+[INFO] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/controller/PdfProcessController.java: /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/controller/PdfProcessController.java uses unchecked or unsafe operations.
+[INFO] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/controller/PdfProcessController.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[176,35] constructor FileContent in class com.optum.dms.pdfprocess.entity.FileContent cannot be applied to given types;
+  required: no arguments
+  found:    java.lang.String,java.lang.String
+  reason: actual and formal argument lists differ in length
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[177,41] constructor FileProperties in class com.optum.dms.pdfprocess.entity.FileProperties cannot be applied to given types;
+  required: no arguments
+  found:    java.lang.String,com.optum.dms.pdfprocess.entity.FileContent
+  reason: actual and formal argument lists differ in length
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[178,28] constructor Document in class com.optum.dms.pdfprocess.entity.Document cannot be applied to given types;
+  required: no arguments
+  found:    java.lang.String,java.lang.String,java.lang.String,com.optum.dms.pdfprocess.entity.FileProperties
+  reason: actual and formal argument lists differ in length
+[INFO] 3 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.740 s
+[INFO] Finished at: 2025-04-29T13:49:25+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project pdf-process: Compilation failure: Compilation failure: 
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[176,35] constructor FileContent in class com.optum.dms.pdfprocess.entity.FileContent cannot be applied to given types;
+[ERROR]   required: no arguments
+[ERROR]   found:    java.lang.String,java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[177,41] constructor FileProperties in class com.optum.dms.pdfprocess.entity.FileProperties cannot be applied to given types;
+[ERROR]   required: no arguments
+[ERROR]   found:    java.lang.String,com.optum.dms.pdfprocess.entity.FileContent
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /Users/ritkesh_singh@optum.com/Downloads/pdfprocess/src/main/java/com/optum/dms/pdfprocess/service/OcrHandler.java:[178,28] constructor Document in class com.optum.dms.pdfprocess.entity.Document cannot be applied to given types;
+[ERROR]   required: no arguments
+[ERROR]   found:    java.lang.String,java.lang.String,java.lang.String,com.optum.dms.pdfprocess.entity.FileProperties
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 pdfprocess % 
 
