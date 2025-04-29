@@ -1,0 +1,40 @@
+package com.optum.dms.pdfprocess.controller;
+
+import com.optum.dms.pdfprocess.entity.PdfDocument;
+import com.optum.dms.pdfprocess.repository.PdfRepo;
+import com.optum.dms.pdfprocess.service.OcrHandler;
+import com.optum.dms.pdfprocess.service.PdfService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+public class OcrProcessController {
+    @Autowired
+    PdfService pdfService;
+    @Autowired
+    OcrHandler ocrHandler;
+    @Autowired
+    PdfRepo pdfRepo;
+
+    @GetMapping("/ocr-process")
+    public ResponseEntity<?> processPdf(){
+//        List<PdfDocument> pdfDocumentList = pdfService.findAllDocument("Processing");
+//        if(!pdfDocumentList.isEmpty()){
+//            pdfDocumentList.forEach(pdfDocument -> {
+        PdfDocument pdfDocument = new PdfDocument();
+                ocrHandler.processPdfTest(pdfDocument);
+//                pdfDocument.setStatus("Processed");
+//                pdfRepo.save(pdfDocument);
+//            });
+//
+//        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+}
