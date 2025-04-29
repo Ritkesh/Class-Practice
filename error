@@ -1,1 +1,36 @@
-https://dms-svcmesh-dev-ctc.optum.com/api/v1.0/getMrmPdf2?chartID=0d11638de8a563fae0635499330a2ddd&user=TalendUser
+    public File createTempPdfFile(String chartId, String user) {
+        String url = "https://dms-svcmesh-dev-ctc.optum.com/api/v1.0/getMrmPdf2?chartID=" + chartId + "&user=" + user;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_OCTET_STREAM)); // Accept binary stream
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Resource> response = restTemplate.exchange(
+                URI.create(url),
+                HttpMethod.GET,
+                entity,
+                Resource.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            try (
+                InputStream in = response.getBody().getInputStream();
+                File tempFile = File.createTempFile("temp_pdf_", ".pdf");
+                FileOutputStream out = new FileOutputStream(tempFile)
+            ) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                System.out.println("Temporary file created at: " + tempFile.getAbsolutePath());
+                return tempFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        throw new RuntimeException("Failed to create temp file from API");
+    }
