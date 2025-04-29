@@ -1,13 +1,37 @@
-  "entity-type": "document",
-  "name": "output618695450588501866.pdf",
-  "type": "File",
-  "properties": {
-    "dc:title": "output618695450588501866.pdf"
-  },
-  "file:content": {
-    "upload-batch": {
-batchId-03964f5e-702d-4620-8316-e84f277377d2",
-      "upload-fileId": 0
+
+    private void createDocument(String path, String batchId, File file) {
+        String url = "https://nuxeodev.optum.com/nuxeo/api/v1/path/" + path;
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NXproperties","*");
+        headers.set("X-NXRepository","default");
+        String requestBody = "{\n" +
+                "  \"entity-type\": \"document\",\n" +
+                "  \"name\": \"" + file.getName() + "\",\n" +
+                "  \"type\": \"File\",\n" +
+                "  \"properties\": {\n" +
+                "    \"dc:title\": \"" + file.getName() + "\"\n" +
+                "  ,\n" +
+                "  \"file:content\": {\n" +
+                "    \"upload-batch\":\""  +batchId + "\",\n" +
+                "      \"upload-fileId\": \"0\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        System.out.println("request body for create document:" + requestBody);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        RestTemplate restTemplate = new RestTemplate();
+//
+//        restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//        System.out.println("");
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        System.out.println("Upload response: " + response.getBody());
+        System.out.println("Status :" +response.getStatusCode());
     }
-  }
-}
