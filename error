@@ -1,29 +1,21 @@
-package com.yourpackage.config;
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ocrmypdf % clear                    
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
-import org.springframework.data.mongodb.core.convert.DbRefResolver;
-
-@Configuration
-public class MongoConfig {
-
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory,
-                                                       MongoMappingContext context,
-                                                       MongoCustomConversions conversions) {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, context);
-        converter.setCustomConversions(conversions);
-
-        // Disable _class field
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-
-        return converter;
-    }
-}
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ocrmypdf % podman build -t ocrmypdfapp:test -f Dockerfile .
+[1/3] STEP 1/4: FROM docker.repo1.uhc.com/alpine:latest AS base
+[1/3] STEP 2/4: ENV LANG=C.UTF-8
+--> Using cache 7b55ce5b752100cd170018de0b4b899fe613fea733094c119c6c9f09440363cc
+--> 7b55ce5b7521
+[1/3] STEP 3/4: ENV TZ=UTC
+--> Using cache 61eb0ca1232bb99c44d720095d6df99044a16fddd747251e05acb50b12cc5fb9
+--> 61eb0ca1232b
+[1/3] STEP 4/4: RUN apk add --no-cache   python3   zlib
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
+202DEA90FFFF0000:error:0A000086:SSL routines:tls_post_process_server_certificate:certificate verify failed:ssl/statem/statem_clnt.c:2103:
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.21/main: Permission denied
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
+202DEA90FFFF0000:error:0A000086:SSL routines:tls_post_process_server_certificate:certificate verify failed:ssl/statem/statem_clnt.c:2103:
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.21/community: Permission denied
+ERROR: unable to select packages:
+  python3 (no such package):
+    required by: world[python3]
+Error: building at STEP "RUN apk add --no-cache   python3   zlib": while running runtime: exit status 1
