@@ -1,19 +1,17 @@
+
 FROM docker.repo1.uhc.com/alpine:latest AS base
 
 ENV LANG=C.UTF-8
 ENV TZ=UTC
 
-# Install basic packages including CA certificates
 RUN apk add --no-cache \
-  ca-certificates \
   python3 \
-  zlib \
-  bash \
-  curl
+  zlib
 
 FROM base AS builder
 
 RUN apk add --no-cache \
+    ca-certificates \
     git \
     python3-dev \
     py3-pyarrow \
@@ -32,6 +30,7 @@ COPY pyproject.toml pyproject.toml
 
 RUN uv sync --frozen --no-install-project --no-dev
 
+
 COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen \
@@ -40,7 +39,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM base
 
-# Install application dependencies
 RUN apk update && apk add --no-cache \
     ghostscript \
     jbig2dec \
@@ -57,21 +55,16 @@ RUN apk update && apk add --no-cache \
     tesseract-ocr-data-osd \
     ttf-droid \
     unpaper \
-    openjdk17 \
     && rm -rf /var/cache/apk/*
 
-# Set JAVA_HOME for OpenJDK
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-ENV PATH=$JAVA_HOME/bin:$PATH
+WORKDIR /app
 
-# Create a user and group
+# Create the app user and group
+# RUN groupadd -r app && useradd -r -g app app
+
+# Create a group and user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Set up working directory and permissions
-WORKDIR /app
-RUN mkdir -p /app && chown appuser:appgroup /app
-
-# Copy application files from builder stage
 COPY --from=builder --chown=appuser:appgroup /app /app
 
 RUN rm -rf /app/.git && \
@@ -80,11 +73,25 @@ RUN rm -rf /app/.git && \
 
 ENV PATH="/app/.venv/bin:${PATH}"
 
-# Copy JAR file and properties file
+
+# Install OpenJDK 17
+RUN apk add --no-cache openjdk17
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+WORKDIR /app
+
+# # Copy the application JAR file to the container
 COPY target/linPdf-0.0.1-SNAPSHOT.jar app.jar
+
+# # Copy the application-docker.properties file to the container
 COPY target/application-docker.properties application.properties
 
+# # Expose the port the application runs on
 EXPOSE 9040
 
-# Run the application with Java
+# Run the application
+# ENTRYPOINT ["/app/.venv/bin/ocrmypdf"]
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
