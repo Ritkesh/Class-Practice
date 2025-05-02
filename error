@@ -22,3 +22,4 @@ ERROR: unable to select packages:
   python3 (no such package):
     required by: world[python3]
 Error: building at STEP "RUN apk add --no-cache   ca-certificates   python3   zlib   bash   curl": while running runtime: exit status 4
+abc
