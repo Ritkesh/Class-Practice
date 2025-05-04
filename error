@@ -1,25 +1,98 @@
-[1/3] STEP 1/5: FROM docker.repo1.uhc.com/alpine:latest AS base
-[1/3] STEP 2/5: ENV LANG=C.UTF-8
---> Using cache 7b55ce5b752100cd170018de0b4b899fe613fea733094c119c6c9f09440363cc
---> 7b55ce5b7521
-[1/3] STEP 3/5: ENV TZ=UTC
---> Using cache 61eb0ca1232bb99c44d720095d6df99044a16fddd747251e05acb50b12cc5fb9
---> 61eb0ca1232b
-[1/3] STEP 4/5: RUN sed -i 's|https://dl-cdn.alpinelinux.org/alpine|http://docker.repo1.uhc.com/alpine|' /etc/apk/repositories
---> f2034cf0e053
-[1/3] STEP 5/5: RUN apk add --no-cache   ca-certificates   python3   zlib   bash   curl
-fetch http://docker.repo1.uhc.com/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
-WARNING: fetching http://docker.repo1.uhc.com/alpine/v3.21/main: No such file or directory
-fetch http://docker.repo1.uhc.com/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
-WARNING: fetching http://docker.repo1.uhc.com/alpine/v3.21/community: No such file or directory
-ERROR: unable to select packages:
-  bash (no such package):
-    required by: world[bash]
-  ca-certificates (no such package):
-    required by: world[ca-certificates]
-  curl (no such package):
-    required by: world[curl]
-  python3 (no such package):
-    required by: world[python3]
-Error: building at STEP "RUN apk add --no-cache   ca-certificates   python3   zlib   bash   curl": while running runtime: exit status 4
-abc
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class PdfMetadataExtractor {
+
+    static class MetadataEntry {
+        String value;
+        int page;
+
+        public MetadataEntry(String value, int page) {
+            this.value = value;
+            this.page = page;
+        }
+
+        @Override
+        public String toString() {
+            return "{ value: \"" + value + "\", page: " + page + " }";
+        }
+    }
+
+    // Supported date formats
+    private static final List<DateTimeFormatter> DATE_FORMATS = List.of(
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+            DateTimeFormatter.ofPattern("d MMM yyyy"),
+            DateTimeFormatter.ofPattern("MMM d, yyyy"),
+            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy"),
+            DateTimeFormatter.ofPattern("d-M-yy")
+    );
+
+    public static void main(String[] args) throws Exception {
+        File file = new File("path/to/your/ocr-output.pdf");
+        PDDocument document = PDDocument.load(file);
+
+        Map<String, MetadataEntry> metadata = new HashMap<>();
+
+        // Regex for name
+        Pattern namePattern = Pattern.compile("(?i)Patient Name[:\\s]*([A-Z][a-z]+)\\s+([A-Z][a-z]+)");
+        // Regex for any DOB/DOS label followed by a date-like string
+        Pattern datePattern = Pattern.compile("(?i)(DOB|Date of Birth|DOS|Date of Service)[:\\s]*([A-Za-z0-9,./-]+)");
+
+        PDFTextStripper stripper = new PDFTextStripper();
+        int totalPages = document.getNumberOfPages();
+
+        for (int page = 1; page <= totalPages; page++) {
+            stripper.setStartPage(page);
+            stripper.setEndPage(page);
+            String text = stripper.getText(document);
+
+            // Extract name
+            Matcher nameMatcher = namePattern.matcher(text);
+            if (nameMatcher.find() && !metadata.containsKey("Patient Name")) {
+                metadata.put("Patient Name", new MetadataEntry(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
+            }
+
+            // Extract DOB and DOS with flexible date parsing
+            Matcher dateMatcher = datePattern.matcher(text);
+            while (dateMatcher.find()) {
+                String label = dateMatcher.group(1).toUpperCase();
+                String rawDate = dateMatcher.group(2);
+                String parsedDate = normalizeDate(rawDate);
+
+                if (parsedDate != null) {
+                    if (label.contains("DOB") && !metadata.containsKey("DOB")) {
+                        metadata.put("DOB", new MetadataEntry(parsedDate, page));
+                    } else if (label.contains("DOS") && !metadata.containsKey("DOS")) {
+                        metadata.put("DOS", new MetadataEntry(parsedDate, page));
+                    }
+                }
+            }
+        }
+
+        document.close();
+
+        // Output the extracted metadata
+        metadata.forEach((key, entry) -> System.out.println(key + ": " + entry));
+    }
+
+    // Normalize date to yyyy-MM-dd
+    private static String normalizeDate(String dateStr) {
+        String cleaned = dateStr.replaceAll("(st|nd|rd|th)", ""); // remove 3rd, 1st, etc.
+        for (DateTimeFormatter fmt : DATE_FORMATS) {
+            try {
+                return LocalDate.parse(cleaned, fmt).toString(); // returns ISO format
+            } catch (DateTimeParseException ignored) {}
+        }
+        return null;
+    }
+}
