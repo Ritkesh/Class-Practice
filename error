@@ -4,5 +4,6 @@ private static Pattern buildDatePattern(List<String> dobLabels, List<String> dos
     all.addAll(dosLabels);
     if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
     String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
-    return Pattern.compile("(?i)(" + joined + ")\\s*[:\\s]+([A-Za-z0-9,./-]+)");
+    // Allow optional whitespace and optional separators like :, ;, -, or just space
+    return Pattern.compile("(?i)(" + joined + ")\\s*[:;\\-]?\\s*([A-Za-z0-9,./-]+)");
 }
