@@ -1,18 +1,168 @@
-private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
-    for (String label : labels) {
-        // Pattern to match common date formats
-        String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
-                + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"           // e.g., 12/05/2023 or 12-05-23
-                + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"        // e.g., 2023-05-12
-                + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"            // e.g., January 1, 2023
-                + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4})";         // e.g., 1 January 2023
+package com.optum.dms.pdfprocess.service;
 
-        Pattern pattern = Pattern.compile(datePattern);
-        Matcher matcher = pattern.matcher(text);
+import com.optum.dms.pdfprocess.entity.PdfMetaData;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.stereotype.Service;
 
-        if (matcher.find() && !metadata.containsKey(key)) {
-            metadata.put(key, new PdfMetaData(matcher.group(1).trim(), page));
-            break;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Service
+public class PdfMetadataExtractorService {
+    private static final List<DateTimeFormatter> DATE_FORMATS = List.of(
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+            DateTimeFormatter.ofPattern("d MMM yyyy"),
+            DateTimeFormatter.ofPattern("MMM d, yyyy"),
+            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy"),
+            DateTimeFormatter.ofPattern("d-M-yy")
+    );
+
+    public Map<String, PdfMetaData> getMetaData(File file) throws IOException {
+        PDDocument document = PDDocument.load(file);
+        Map<String, PdfMetaData> metadata = new HashMap<>();
+
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src/main/resources/application.properties"));
+
+        List<String> dobLabels = getLabels(properties.getProperty("labels.dob"));
+        List<String> dobLabels1 = getLabels(properties.getProperty("labels.dob1"));
+        List<String> dosLabels = getLabels(properties.getProperty("labels.dos"));
+        List<String> firstnameLabels = getLabels(properties.getProperty("labels.firstname"));
+        List<String> middlenameLabels = getLabels(properties.getProperty("labels.middlename"));
+        List<String> lastnameLabels = getLabels(properties.getProperty("labels.lastname")); // FIXED key
+
+        Pattern datePattern = buildDatePattern(dobLabels, dosLabels);
+
+        PDFTextStripper stripper = new PDFTextStripper();
+        int totalPages = document.getNumberOfPages();
+
+        for (int page = 1; page <= totalPages; page++) {
+            stripper.setStartPage(page);
+            stripper.setEndPage(page);
+            String text = stripper.getText(document);
+
+            // Extract names
+            extractFieldByLabels(text, firstnameLabels, "First Name", metadata, page);
+            extractFieldByLabels(text, middlenameLabels, "Middle Name", metadata, page);
+            extractFieldByLabels(text, lastnameLabels, "Last Name", metadata, page);
+            extractDateByLabels(text,dobLabels,"DOB :",metadata,page);
+            extractDateByLabels(text,dobLabels1,"Date OF Birth:",metadata,page);
+
+            // Extract DOB / DOS
+            Matcher dateMatcher = datePattern.matcher(text);
+            while (dateMatcher.find()) {
+                String label = dateMatcher.group(1).toUpperCase();
+                String rawDate = dateMatcher.group(2);
+                System.out.println("Matched label:"+label+",Raw Date:" + rawDate);
+                String parsedDate = normalizeDate(rawDate);
+
+                if (parsedDate != null) {
+                    if (label.contains("DOB") && !metadata.containsKey("DOB")) {
+                        metadata.put("DOB", new PdfMetaData(parsedDate, page));
+                    }
+                    if (label.contains("DOS") && !metadata.containsKey("DOS")) {
+                        metadata.put("DOS", new PdfMetaData(parsedDate, page));
+                    }
+                }
+            }
+        }
+
+        document.close();
+        metadata.forEach((key, entry) -> System.out.println(key + ": " + entry));
+        return metadata;
+    }
+
+    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
+        for (String label : labels) {
+            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)?)");
+            Matcher matcher = pattern.matcher(text);
+            if (matcher.find() && !metadata.containsKey(key)) {
+                metadata.put(key, new PdfMetaData(matcher.group(1), page));
+                break;
+            }
         }
     }
-}
+
+    private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
+        for (String label : labels) {
+            // Pattern to match common date formats
+            String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
+                    + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"           // e.g., 12/05/2023 or 12-05-23
+                    + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"        // e.g., 2023-05-12
+                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"            // e.g., January 1, 2023
+                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4})";         // e.g., 1 January 2023
+
+            Pattern pattern = Pattern.compile(datePattern);
+            Matcher matcher = pattern.matcher(text);
+
+            if (matcher.find() && !metadata.containsKey(key)) {
+                metadata.put(key, new PdfMetaData(matcher.group(1).trim(), page));
+                break;
+            }
+        }
+    }
+
+    private static String normalizeDate(String dateStr) {
+        String cleaned = dateStr.replaceAll("(st|nd|rd|th)", "").trim();
+        for (DateTimeFormatter fmt : DATE_FORMATS) {
+            try {
+                return LocalDate.parse(cleaned, fmt).toString();
+            } catch (DateTimeParseException ignored) {}
+        }
+        return null;
+    }
+
+    private static List<String> getLabels(String csv) {
+        return csv == null ? List.of() : Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+    }
+
+    private static Pattern buildDatePattern(List<String> dobLabels, List<String> dosLabels) {
+        Set<String> all = new HashSet<>();
+        all.addAll(dobLabels);
+        all.addAll(dosLabels);
+        if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
+
+        String labelPattern = String.join("|", all)
+                .replaceAll("([.?^$+*()\\[\\]{}|\\\\])", "\\\\$1"); // escape regex chars
+
+        // Accept colon, dash, or just space after label, then capture possible date format
+        return Pattern.compile("(?i)(" + labelPattern + ")[\\s:;\\-]*([A-Za-z0-9 ,./-]{6,})");
+    }
+} 
+this is the code
+
+spring.data.mongodb.uri=mongodb://ois_ldap:Cwfw18yf!@rp000028707.uhc.com:27017,rp000028708.uhc.com:27017,rp000028709.uhc.com:27017/sms?replicaSet=rd0&connectTimeoutMS=10000&authSource=%24external&authMechanism=PLAIN&readPreference=primary
+spring.data.mongodb.database=jade
+server.port=0
+pdf.keywords=name,currency
+process.timeout.seconds=60
+application.user=TalendUser
+pdf.url=https://dms-svcmesh-dev-ctc.optum.com/api/v1.0/getMrmPdf2?chartID=
+nuxeo.username=dmsjadenx_nprd
+nuxeo.password=prC1Y!ZU3%RU8stQ
+file.url=https://nuxeodev.optum.com/nuxeo/api/v1/
+nuxeo.file.path=MPA/test
+
+
+labels.dob=DOB;
+labels.dob1=Date OF Birth:
+#labels.dos=DOS,Date of Service
+labels.firstname=First Name
+labels.middlename=Middle Name
+labels.lastname=Last Name
+
+this is the application.properties and you have the pdf and i have to return page no which can be multiple
+and you have the pdf
