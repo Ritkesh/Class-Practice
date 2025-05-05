@@ -27,9 +27,9 @@ public class PdfMetadataExtractorService {
             DateTimeFormatter.ofPattern("d-M-yy")
     );
 
-    public Map<String, PdfMetaData> getMetaData(File file) throws IOException {
+    public Map<String, List<PdfMetaData>> getMetaData(File file) throws IOException {
         PDDocument document = PDDocument.load(file);
-        Map<String, PdfMetaData> metadata = new HashMap<>();
+        Map<String, List<PdfMetaData>> metadata = new HashMap<>();
 
         Properties properties = new Properties();
         properties.load(new FileInputStream("src/main/resources/application.properties"));
@@ -39,7 +39,7 @@ public class PdfMetadataExtractorService {
         List<String> dosLabels = getLabels(properties.getProperty("labels.dos"));
         List<String> firstnameLabels = getLabels(properties.getProperty("labels.firstname"));
         List<String> middlenameLabels = getLabels(properties.getProperty("labels.middlename"));
-        List<String> lastnameLabels = getLabels(properties.getProperty("labels.lastname")); // FIXED key
+        List<String> lastnameLabels = getLabels(properties.getProperty("labels.lastname"));
 
         Pattern datePattern = buildDatePattern(dobLabels, dosLabels);
 
@@ -51,65 +51,75 @@ public class PdfMetadataExtractorService {
             stripper.setEndPage(page);
             String text = stripper.getText(document);
 
-            // Extract names
             extractFieldByLabels(text, firstnameLabels, "First Name", metadata, page);
             extractFieldByLabels(text, middlenameLabels, "Middle Name", metadata, page);
             extractFieldByLabels(text, lastnameLabels, "Last Name", metadata, page);
-            extractDateByLabels(text,dobLabels,"DOB :",metadata,page);
-            extractDateByLabels(text,dobLabels1,"Date OF Birth:",metadata,page);
+            extractDateByLabels(text, dobLabels, "DOB", metadata, page);
+            extractDateByLabels(text, dobLabels1, "DOB", metadata, page);
 
-            // Extract DOB / DOS
             Matcher dateMatcher = datePattern.matcher(text);
             while (dateMatcher.find()) {
                 String label = dateMatcher.group(1).toUpperCase();
                 String rawDate = dateMatcher.group(2);
-                System.out.println("Matched label:"+label+",Raw Date:" + rawDate);
                 String parsedDate = normalizeDate(rawDate);
 
                 if (parsedDate != null) {
-                    if (label.contains("DOB") && !metadata.containsKey("DOB")) {
-                        metadata.put("DOB", new PdfMetaData(parsedDate, page));
-                    }
-                    if (label.contains("DOS") && !metadata.containsKey("DOS")) {
-                        metadata.put("DOS", new PdfMetaData(parsedDate, page));
+                    if (label.contains("DOB")) {
+                        addToMetadataList(metadata, "DOB", parsedDate, page);
+                    } else if (label.contains("DOS")) {
+                        addToMetadataList(metadata, "DOS", parsedDate, page);
                     }
                 }
             }
         }
 
         document.close();
-        metadata.forEach((key, entry) -> System.out.println(key + ": " + entry));
+        metadata.forEach((key, list) -> list.forEach(meta -> System.out.println(key + ": " + meta)));
         return metadata;
     }
 
-    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
+    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
         for (String label : labels) {
             Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)?)");
             Matcher matcher = pattern.matcher(text);
-            if (matcher.find() && !metadata.containsKey(key)) {
-                metadata.put(key, new PdfMetaData(matcher.group(1), page));
-                break;
+            while (matcher.find()) {
+                String value = matcher.group(1).trim();
+                addToMetadataList(metadata, key, value, page);
             }
         }
     }
 
-    private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
+    private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
         for (String label : labels) {
-            // Pattern to match common date formats
             String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
-                    + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"           // e.g., 12/05/2023 or 12-05-23
-                    + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"        // e.g., 2023-05-12
-                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"            // e.g., January 1, 2023
-                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4})";         // e.g., 1 January 2023
-
+                    + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"
+                    + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"
+                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"
+                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4})";
             Pattern pattern = Pattern.compile(datePattern);
             Matcher matcher = pattern.matcher(text);
 
-            if (matcher.find() && !metadata.containsKey(key)) {
-                metadata.put(key, new PdfMetaData(matcher.group(1).trim(), page));
-                break;
+            while (matcher.find()) {
+                String rawDate = matcher.group(1).trim();
+                String parsedDate = normalizeDate(rawDate);
+                if (parsedDate != null) {
+                    addToMetadataList(metadata, key, parsedDate, page);
+                }
             }
         }
+    }
+
+    private static void addToMetadataList(Map<String, List<PdfMetaData>> metadata, String key, String value, int page) {
+        List<PdfMetaData> list = metadata.computeIfAbsent(key, k -> new ArrayList<>());
+
+        for (PdfMetaData meta : list) {
+            if (meta.getValue().equalsIgnoreCase(value)) {
+                meta.addPage(page);
+                return;
+            }
+        }
+
+        list.add(new PdfMetaData(value, page));
     }
 
     private static String normalizeDate(String dateStr) {
@@ -133,36 +143,11 @@ public class PdfMetadataExtractorService {
         Set<String> all = new HashSet<>();
         all.addAll(dobLabels);
         all.addAll(dosLabels);
-        if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
+        if (all.isEmpty()) return Pattern.compile("(?!)");
 
         String labelPattern = String.join("|", all)
-                .replaceAll("([.?^$+*()\\[\\]{}|\\\\])", "\\\\$1"); // escape regex chars
+                .replaceAll("([.?^$+*()\\[\\]{}|\\\\])", "\\\\$1");
 
-        // Accept colon, dash, or just space after label, then capture possible date format
         return Pattern.compile("(?i)(" + labelPattern + ")[\\s:;\\-]*([A-Za-z0-9 ,./-]{6,})");
     }
-} 
-this is the code
-
-spring.data.mongodb.uri=mongodb://ois_ldap:Cwfw18yf!@rp000028707.uhc.com:27017,rp000028708.uhc.com:27017,rp000028709.uhc.com:27017/sms?replicaSet=rd0&connectTimeoutMS=10000&authSource=%24external&authMechanism=PLAIN&readPreference=primary
-spring.data.mongodb.database=jade
-server.port=0
-pdf.keywords=name,currency
-process.timeout.seconds=60
-application.user=TalendUser
-pdf.url=https://dms-svcmesh-dev-ctc.optum.com/api/v1.0/getMrmPdf2?chartID=
-nuxeo.username=dmsjadenx_nprd
-nuxeo.password=prC1Y!ZU3%RU8stQ
-file.url=https://nuxeodev.optum.com/nuxeo/api/v1/
-nuxeo.file.path=MPA/test
-
-
-labels.dob=DOB;
-labels.dob1=Date OF Birth:
-#labels.dos=DOS,Date of Service
-labels.firstname=First Name
-labels.middlename=Middle Name
-labels.lastname=Last Name
-
-this is the application.properties and you have the pdf and i have to return page no which can be multiple
-and you have the pdf
+}
