@@ -1,6 +1,117 @@
-    private static Pattern buildNamePattern(List<String> labels) {
-        if (labels.isEmpty()) return Pattern.compile("(?!)"); // always fail
-        String joined = String.join("|", labels).replaceAll("([\\W])", "\\\\$1");
+package com.optum.dms.pdfprocess.service;
+
+
+import com.optum.dms.pdfprocess.entity.PdfMetaData;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Service
+public class PdfMetadataExtractorService {
+    private static final List<DateTimeFormatter> DATE_FORMATS = List.of(
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+            DateTimeFormatter.ofPattern("d MMM yyyy"),
+            DateTimeFormatter.ofPattern("MMM d, yyyy"),
+            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy"),
+            DateTimeFormatter.ofPattern("d-M-yy")
+    );
+
+    public Map<String,PdfMetaData> getMetaData (File file) throws IOException {
+        PDDocument document = PDDocument.load(file);
+
+        Map<String, PdfMetaData> metadata = new HashMap<>();
+
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("src/main/resources/application.properties"));
+
+        List<String>dobLabels = getLabels(properties.getProperty("labels.dob"));
+        List<String>dosLabels = getLabels(properties.getProperty("labels.dos"));
+        List<String>firstname = getLabels(properties.getProperty("labels.firstname"));
+        List<String>middlename = getLabels(properties.getProperty("labels.middlename"));
+        List<String>lastname = getLabels(properties.getProperty("labels.lastname"));
+
+        Pattern namePattern = buildNamePattern(firstname,middlename,lastname);
+
+        Pattern datePattern = buildDatePattern(dobLabels,dosLabels);
+
+        PDFTextStripper stripper = new PDFTextStripper();
+        int totalPages = document.getNumberOfPages();
+
+        for (int page = 1; page <= totalPages; page++) {
+            stripper.setStartPage(page);
+            stripper.setEndPage(page);
+            String text = stripper.getText(document);
+
+            Matcher nameMatcher = namePattern.matcher(text);
+            if (nameMatcher.find() && !metadata.containsKey("First Name")) {
+                metadata.put("First Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
+            }
+            if (nameMatcher.find() && !metadata.containsKey("Middle Name")) {
+                metadata.put("Middle Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
+            }
+            if (nameMatcher.find() && !metadata.containsKey("Last Name")) {
+                metadata.put("Last Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
+            }
+
+            Matcher dateMatcher = datePattern.matcher(text);
+            while (dateMatcher.find()) {
+                String label = dateMatcher.group(1).toUpperCase();
+                String rawDate = dateMatcher.group(2);
+                String parsedDate = normalizeDate(rawDate);
+
+                if (parsedDate != null) {
+                    if (label.contains("DOB") && !metadata.containsKey("DOB")) {
+                        metadata.put("DOB", new PdfMetaData(parsedDate, page));
+                    }
+                    if (label.contains("DOS") && !metadata.containsKey("DOS")) {
+                        metadata.put("DOS", new PdfMetaData(parsedDate, page));
+                    }
+                }
+            }
+        }
+
+        document.close();
+
+        metadata.forEach((key, entry) -> System.out.println(key + ": " + entry));
+        return metadata;
+    }
+
+    private static String normalizeDate(String dateStr) {
+        String cleaned = dateStr.replaceAll("(st|nd|rd|th)", ""); // remove 3rd, 1st, etc.
+        for (DateTimeFormatter fmt : DATE_FORMATS) {
+            try {
+                return LocalDate.parse(cleaned, fmt).toString(); // returns ISO format
+            } catch (DateTimeParseException ignored) {}
+        }
+        return null;
+    }
+
+    private static List<String> getLabels(String csv){
+        return csv == null ? List.of():Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s->!s.isEmpty())
+                .toList();
+    }
+
+    private static Pattern buildNamePattern(List<String> firstname,List<String>middlename,List<String>lastname) {
+        Set<String> all = new HashSet<>();
+        all.addAll(firstname);
+        all.addAll(middlename);
+        all.addAll(lastname);
+        if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
+        String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
         return Pattern.compile("(?i)(" + joined + ")[:\\s]*([A-Z][a-z]+\\s+[A-Z][a-z]+)");
     }
 
@@ -12,3 +123,6 @@
         String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
         return Pattern.compile("(?i)(" + joined + ")[:\\s]*([A-Za-z0-9,./-]+)");
     }
+
+
+}
