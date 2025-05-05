@@ -1,6 +1,5 @@
 package com.optum.dms.pdfprocess.service;
 
-
 import com.optum.dms.pdfprocess.entity.PdfMetaData;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -28,23 +27,20 @@ public class PdfMetadataExtractorService {
             DateTimeFormatter.ofPattern("d-M-yy")
     );
 
-    public Map<String,PdfMetaData> getMetaData (File file) throws IOException {
+    public Map<String, PdfMetaData> getMetaData(File file) throws IOException {
         PDDocument document = PDDocument.load(file);
-
         Map<String, PdfMetaData> metadata = new HashMap<>();
 
         Properties properties = new Properties();
         properties.load(new FileInputStream("src/main/resources/application.properties"));
 
-        List<String>dobLabels = getLabels(properties.getProperty("labels.dob"));
-        List<String>dosLabels = getLabels(properties.getProperty("labels.dos"));
-        List<String>firstname = getLabels(properties.getProperty("labels.firstname"));
-        List<String>middlename = getLabels(properties.getProperty("labels.middlename"));
-        List<String>lastname = getLabels(properties.getProperty("labels.lastname"));
+        List<String> dobLabels = getLabels(properties.getProperty("labels.dob"));
+        List<String> dosLabels = getLabels(properties.getProperty("labels.dos"));
+        List<String> firstnameLabels = getLabels(properties.getProperty("labels.firstname"));
+        List<String> middlenameLabels = getLabels(properties.getProperty("labels.middlename"));
+        List<String> lastnameLabels = getLabels(properties.getProperty("labels.lastname")); // FIXED key
 
-        Pattern namePattern = buildNamePattern(firstname,middlename,lastname);
-
-        Pattern datePattern = buildDatePattern(dobLabels,dosLabels);
+        Pattern datePattern = buildDatePattern(dobLabels, dosLabels);
 
         PDFTextStripper stripper = new PDFTextStripper();
         int totalPages = document.getNumberOfPages();
@@ -54,17 +50,12 @@ public class PdfMetadataExtractorService {
             stripper.setEndPage(page);
             String text = stripper.getText(document);
 
-            Matcher nameMatcher = namePattern.matcher(text);
-            if (nameMatcher.find() && !metadata.containsKey("First Name")) {
-                metadata.put("First Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
-            }
-            if (nameMatcher.find() && !metadata.containsKey("Middle Name")) {
-                metadata.put("Middle Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
-            }
-            if (nameMatcher.find() && !metadata.containsKey("Last Name")) {
-                metadata.put("Last Name", new PdfMetaData(nameMatcher.group(1) + " " + nameMatcher.group(2), page));
-            }
+            // Extract names
+            extractFieldByLabels(text, firstnameLabels, "First Name", metadata, page);
+            extractFieldByLabels(text, middlenameLabels, "Middle Name", metadata, page);
+            extractFieldByLabels(text, lastnameLabels, "Last Name", metadata, page);
 
+            // Extract DOB / DOS
             Matcher dateMatcher = datePattern.matcher(text);
             while (dateMatcher.find()) {
                 String label = dateMatcher.group(1).toUpperCase();
@@ -72,7 +63,7 @@ public class PdfMetadataExtractorService {
                 String parsedDate = normalizeDate(rawDate);
 
                 if (parsedDate != null) {
-                    if (label.contains("DOB")) {
+                    if (label.contains("DOB") && !metadata.containsKey("DOB")) {
                         metadata.put("DOB", new PdfMetaData(parsedDate, page));
                     }
                     if (label.contains("DOS") && !metadata.containsKey("DOS")) {
@@ -83,48 +74,37 @@ public class PdfMetadataExtractorService {
         }
 
         document.close();
-
         metadata.forEach((key, entry) -> System.out.println(key + ": " + entry));
         return metadata;
     }
 
+    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, PdfMetaData> metadata, int page) {
+        for (String label : labels) {
+            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)?)");
+            Matcher matcher = pattern.matcher(text);
+            if (matcher.find() && !metadata.containsKey(key)) {
+                metadata.put(key, new PdfMetaData(matcher.group(1), page));
+                break;
+            }
+        }
+    }
+
     private static String normalizeDate(String dateStr) {
-        String cleaned = dateStr.replaceAll("(st|nd|rd|th)", ""); // remove 3rd, 1st, etc.
+        String cleaned = dateStr.replaceAll("(st|nd|rd|th)", "").trim();
         for (DateTimeFormatter fmt : DATE_FORMATS) {
             try {
-                return LocalDate.parse(cleaned, fmt).toString(); // returns ISO format
+                return LocalDate.parse(cleaned, fmt).toString();
             } catch (DateTimeParseException ignored) {}
         }
         return null;
     }
 
-    private static List<String> getLabels(String csv){
-        return csv == null ? List.of():Arrays.stream(csv.split(","))
+    private static List<String> getLabels(String csv) {
+        return csv == null ? List.of() : Arrays.stream(csv.split(","))
                 .map(String::trim)
-                .filter(s->!s.isEmpty())
+                .filter(s -> !s.isEmpty())
                 .toList();
     }
-
-    private static Pattern buildNamePattern(List<String> firstname,List<String>middlename,List<String>lastname) {
-        Set<String> all = new HashSet<>();
-        all.addAll(firstname);
-        all.addAll(middlename);
-        all.addAll(lastname);
-        if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
-        String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
-        return Pattern.compile("(?i)(" + joined + ")[:\\s]*([A-Z][a-z]+\\s+[A-Z][a-z]+)");
-    }
-
-
-//    private static Pattern buildDatePattern(List<String> dobLabels, List<String> dosLabels) {
-//        Set<String> all = new HashSet<>();
-//        all.addAll(dobLabels);
-//        all.addAll(dosLabels);
-//        if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
-//        String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
-//        return Pattern.compile("(?i)(" + joined + ")\\s*[:\\s]+([A-Za-z0-9,./-]+)");
-//    }
-
 
     private static Pattern buildDatePattern(List<String> dobLabels, List<String> dosLabels) {
         Set<String> all = new HashSet<>();
@@ -132,30 +112,6 @@ public class PdfMetadataExtractorService {
         all.addAll(dosLabels);
         if (all.isEmpty()) return Pattern.compile("(?!)"); // always fail
         String joined = String.join("|", all).replaceAll("([\\W])", "\\\\$1");
-        // Allow optional whitespace and optional separators like :, ;, -, or just space
         return Pattern.compile("(?i)(" + joined + ")\\s*[:;\\-]?\\s*([A-Za-z0-9,./-]+)");
     }
 }
-
-this is code 
-
-spring.data.mongodb.uri=mongodb://ois_ldap:Cwfw18yf!@rp000028707.uhc.com:27017,rp000028708.uhc.com:27017,rp000028709.uhc.com:27017/sms?replicaSet=rd0&connectTimeoutMS=10000&authSource=%24external&authMechanism=PLAIN&readPreference=primary
-spring.data.mongodb.database=jade
-server.port=0
-pdf.keywords=name,currency
-process.timeout.seconds=60
-application.user=TalendUser
-pdf.url=https://dms-svcmesh-dev-ctc.optum.com/api/v1.0/getMrmPdf2?chartID=
-nuxeo.username=dmsjadenx_nprd
-nuxeo.password=prC1Y!ZU3%RU8stQ
-file.url=https://nuxeodev.optum.com/nuxeo/api/v1/
-nuxeo.file.path=MPA/test
-
-
-labels.dob=DOB,Date of Birth,D.O.B.
-labels.dos=DOS,Date of Service
-labels.firstname=First Name
-labels.middlename=Middle Name
-labels.lastnname=Last Name
-
-this is application.properties and pdf is already with you and noty able to fetch DOB
