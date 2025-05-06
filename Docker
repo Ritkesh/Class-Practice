@@ -84,7 +84,7 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 WORKDIR /app
 
 # # Copy the application JAR file to the container
-COPY target/linPdf-0.0.1-SNAPSHOT.jar app.jar
+COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
 
 # # Copy the application-docker.properties file to the container
 COPY target/application-docker.properties application.properties
