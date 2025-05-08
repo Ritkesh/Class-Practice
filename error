@@ -1,8 +1,8 @@
 private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
     for (String label : labels) {
         if (label.equalsIgnoreCase("Patient Name")) {
-            // Custom regex to handle common variations and dynamic trailing text
-            Pattern pattern = Pattern.compile("(?i)Patient Name\\s*[:\\-]?\\s*([A-Z'\\-\\. ]{3,50})(?=\\s{2,}|\\n|$)");
+            // Custom regex to handle common variations and dynamic trailing text without the length restriction
+            Pattern pattern = Pattern.compile("(?i)Patient Name\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
             Matcher matcher = pattern.matcher(text);
             while (matcher.find()) {
                 String value = matcher.group(1).trim().replaceAll("\\s+", " ");
