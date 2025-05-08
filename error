@@ -1,6 +1,7 @@
 package com.optum.dms.pdfprocess.service;
 
 import com.optum.dms.pdfprocess.entity.PdfMetaData;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+@Slf4j
 
 @Service
 public class PdfMetadataExtractorService {
@@ -32,15 +35,13 @@ public class PdfMetadataExtractorService {
 //            DateTimeFormatter.ofPattern("MMMM d, yyyy")
             DateTimeFormatter.ofPattern("M/d/yyyy"),
             DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("MMM dd yyyy"),
-            DateTimeFormatter.ofPattern("yyyy/dd/MM"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+            DateTimeFormatter.ofPattern("M-d-yyyy"),
             DateTimeFormatter.ofPattern("MM-dd-yyyy"),
-            DateTimeFormatter.ofPattern("MM/dd/yyyy"),
-            DateTimeFormatter.ofPattern("M/d/yyyy"),
-            DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            DateTimeFormatter.ofPattern("MMM d, yyyy"),
+            DateTimeFormatter.ofPattern("MMMM d, yyyy"),
+            DateTimeFormatter.ofPattern("MMM dd yyyy"),
+            DateTimeFormatter.ofPattern("MMMM dd yyyy")
+
     );
 
     public Map<String, List<PdfMetaData>> getMetaData(File file) throws IOException {
@@ -79,7 +80,7 @@ public class PdfMetadataExtractorService {
             Matcher dateMatcher = datePattern.matcher(text);
             while (dateMatcher.find()) {
                 String label = dateMatcher.group(1).toUpperCase();
-                String rawDate = dateMatcher.group(2);
+                String rawDate = dateMatcher.group(1);
                 System.out.println("Found date: " + rawDate + " with label: " + label);
                 String parsedDate = normalizeDate(rawDate);
                 System.out.println("Normalized date: " + parsedDate);
@@ -100,29 +101,58 @@ public class PdfMetadataExtractorService {
         return metadata;
     }
 
+//    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
+//        for (String label : labels) {
+//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(<b>|<strong>)?(\\w+(?:\\s\\w+)*)(</b>|</strong>)?(?=\\s*\\n|$)");
+//            Matcher matcher = pattern.matcher(text);
+//            while (matcher.find()) {
+//                String value = matcher.group(1).trim();
+//                addToMetadataList(metadata, key, value, page);
+//            }
+//        }
+//    }
+
+
     private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
         for (String label : labels) {
-            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)*)(?=\\s*\\n|$)");
+//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)*)(?=\\s*\\n|$)");
+//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*((?:\\w+\\s(?!\\s))*\\w+)(?=\\s*\\n|$)");
+            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s*\\n|$)");
+//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s*\\n|$)");
+
             Matcher matcher = pattern.matcher(text);
             while (matcher.find()) {
                 String value = matcher.group(1).trim();
+                log.info("Matched value: {}", value);  // Add logging to see matched values
                 addToMetadataList(metadata, key, value, page);
             }
         }
     }
+
+
+
+
 
     private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
         System.out.println("Extracting dates from page " + page);
         System.out.println("Page text: " + text);
 
         for (String label : labels) {
+//            String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
+//                    + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"
+//                    + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"
+//                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"
+//                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}"
+//                    + "|[A-Za-z]{3,9}\\s\\d{1,2}(st|nd|rd|th)?,\\s\\d{4})"
+//                    + "(?=\\s|$)";
             String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
                     + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"
                     + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"
                     + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"
                     + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}"
                     + "|[A-Za-z]{3,9}\\s\\d{1,2}(st|nd|rd|th)?,\\s\\d{4})"
-                    + "(?=\\s|$)";
+                    + "(?=\\s|$|\\s{1,})";
+
             Pattern pattern = Pattern.compile(datePattern);
             Matcher matcher = pattern.matcher(text);
 
