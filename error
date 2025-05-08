@@ -1,1 +1,57 @@
-Pattern pattern = Pattern.compile("(?i)Patient Name\\s*[:\\-]?\\s*((?:\\S+\\s){1,3}\\S+)(?=\\s{2,})");
+private static String extractUpToMultipleSpaces(String text, String label) {
+    int index = text.indexOf(label);
+    if (index == -1) return null;
+
+    // Work on the substring starting from the label
+    String subText = text.substring(index);
+    Matcher labelMatcher = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*").matcher(subText);
+
+    if (labelMatcher.find()) {
+        int start = labelMatcher.end();
+        String afterLabel = subText.substring(start);
+
+        // Split manually to detect double/multiple spaces
+        StringBuilder nameBuilder = new StringBuilder();
+        String[] tokens = afterLabel.split(" ");
+        int emptyCount = 0;
+
+        for (String token : tokens) {
+            if (token.isBlank()) {
+                emptyCount++;
+                if (emptyCount >= 1) break; // stop on first extra space gap
+                continue;
+            }
+            emptyCount = 0;
+            nameBuilder.append(token).append(" ");
+        }
+
+        return nameBuilder.toString().trim();
+    }
+
+    return null;
+}
+
+
+
+
+private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
+    for (String label : labels) {
+        if (label.equalsIgnoreCase("Patient Name")) {
+            String name = extractUpToMultipleSpaces(text, label);
+            if (name != null && !name.isBlank()) {
+                log.info("Matched patient name: {}", name);
+                addToMetadataList(metadata, key, name, page);
+            }
+            continue;
+        }
+
+        // Default fallback for other fields
+        Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s*\\n|$)");
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            String value = matcher.group(1).trim();
+            log.info("Matched value for {}: {}", key, value);
+            addToMetadataList(metadata, key, value, page);
+        }
+    }
+}
