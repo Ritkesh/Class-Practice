@@ -1,7 +1,1 @@
-# Create the virtual environment
-RUN uv venv --system-site-packages .venv
-
-# Install pip manually inside the virtualenv
-RUN .venv/bin/python -m ensurepip && \
-    .venv/bin/pip install --upgrade pip && \
-    .venv/bin/pip install ocrmypdf
+COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
