@@ -1,3 +1,25 @@
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build -f Dockerfile --tag=docker.optum.com/dms/pdf-processing:1.8 .
+STEP 1/10: FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
+STEP 2/10: ENV LANG=C.UTF-8
+--> Using cache 4b16f456d7f6f1ff234f55388ef1aeeefe843f8cb070683dbc5c90d943388cbe
+--> 4b16f456d7f6
+STEP 3/10: ENV TZ=UTC
+--> Using cache 4d816e001f4e00acaade353b15cc4b7b8951d7c4abe0e84809d907b2c157d2bd
+--> 4d816e001f4e
+STEP 4/10: RUN apk add --no-cache   py3-pip
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
+(1/8) Installing py3-parsing (3.1.4-r0)
+(2/8) Installing py3-parsing-pyc (3.1.4-r0)
+(3/8) Installing py3-packaging (24.2-r0)
+(4/8) Installing py3-packaging-pyc (24.2-r0)
+(5/8) Installing py3-setuptools (70.3.0-r0)
+(6/8) Installing py3-setuptools-pyc (70.3.0-r0)
+(7/8) Installing py3-pip (24.3.1-r0)
+(8/8) Installing py3-pip-pyc (24.3.1-r0)
+Executing busybox-1.37.0-r12.trigger
+OK: 635 MiB in 161 packages
+--> bb26421dd582
 STEP 5/10: RUN .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf
 /bin/sh: .venv/bin/pip: not found
 Error: building at STEP "RUN .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf": while running runtime: exit status 127
