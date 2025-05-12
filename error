@@ -1,8 +1,41 @@
-# Install uv if not preinstalled
-COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
-
-# 👇 Create the virtual environment
-RUN uv venv --system-site-packages .venv
-
-# 👇 Verify pip exists now
-RUN ls -l .venv/bin
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build -f Dockerfile --tag=docker.optum.com/dms/pdf-processing:1.8 .
+STEP 1/13: FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
+STEP 2/13: ENV LANG=C.UTF-8
+--> Using cache 4b16f456d7f6f1ff234f55388ef1aeeefe843f8cb070683dbc5c90d943388cbe
+--> 4b16f456d7f6
+STEP 3/13: ENV TZ=UTC
+--> Using cache 4d816e001f4e00acaade353b15cc4b7b8951d7c4abe0e84809d907b2c157d2bd
+--> 4d816e001f4e
+STEP 4/13: RUN apk add --no-cache   py3-pip
+--> Using cache bb26421dd582788ad7abfb1bf7d0f2055fe7bd59f7bbea353a7cfba7c4c091cb
+--> bb26421dd582
+STEP 5/13: COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
+Trying to pull ghcr.io/astral-sh/uv:0.5.5...
+Getting image source signatures
+Copying blob sha256:f3aa5d1de2dad351d6ea3fb552876633fda08a8d3632e127e63ce645d9a24ad1
+Copying blob sha256:1cc4f370e9ebcd18facec3eaeb37802f8fb9237c17da930d0ff8ca70a81a59c7
+Copying config sha256:473bef5ce7955bef0db4aa677290f27ceb6e58f50b47f51a81cfa5deed5ba364
+Writing manifest to image destination
+--> 048b9f7f75bb
+STEP 6/13: RUN uv venv --system-site-packages .venv
+Using CPython 3.12.10 interpreter at: /usr/bin/python3
+Creating virtual environment at: .venv
+--> 86c966e42457
+STEP 7/13: RUN ls -l .venv/bin
+total 40
+-rw-r--r--    1 root     root          3686 May 12 09:08 activate
+-rw-r--r--    1 root     root          2242 May 12 09:08 activate.bat
+-rw-r--r--    1 root     root          2593 May 12 09:08 activate.csh
+-rw-r--r--    1 root     root          4157 May 12 09:08 activate.fish
+-rw-r--r--    1 root     root          3842 May 12 09:08 activate.nu
+-rw-r--r--    1 root     root          2762 May 12 09:08 activate.ps1
+-rw-r--r--    1 root     root          2383 May 12 09:08 activate_this.py
+-rw-r--r--    1 root     root          1728 May 12 09:08 deactivate.bat
+-rw-r--r--    1 root     root          1215 May 12 09:08 pydoc.bat
+lrwxrwxrwx    1 root     root            16 May 12 09:08 python -> /usr/bin/python3
+lrwxrwxrwx    1 root     root             6 May 12 09:08 python3 -> python
+lrwxrwxrwx    1 root     root             6 May 12 09:08 python3.12 -> python
+--> d4e11961ea25
+STEP 8/13: RUN .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf
+/bin/sh: .venv/bin/pip: not found
+Error: building at STEP "RUN .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf": while running runtime: exit status 127
