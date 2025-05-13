@@ -1,22 +1,69 @@
-ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build -f Dockerfile --tag=docker.optum.com/dms/pdf-processing:1.8 .
-STEP 1/12: FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
-STEP 2/12: ENV LANG=C.UTF-8
---> Using cache 4b16f456d7f6f1ff234f55388ef1aeeefe843f8cb070683dbc5c90d943388cbe
---> 4b16f456d7f6
-STEP 3/12: ENV TZ=UTC
---> Using cache 4d816e001f4e00acaade353b15cc4b7b8951d7c4abe0e84809d907b2c157d2bd
---> 4d816e001f4e
-STEP 4/12: RUN apk add --no-cache   py3-pip
---> Using cache bb26421dd582788ad7abfb1bf7d0f2055fe7bd59f7bbea353a7cfba7c4c091cb
---> bb26421dd582
-STEP 5/12: COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
---> Using cache 048b9f7f75bbbdb8a458375d669a3d3279bb0e512079622ef5f6cf4c666a865c
---> 048b9f7f75bb
-STEP 6/12: RUN uv venv --system-site-packages .venv
---> Using cache 86c966e424577de600a8266bc037eb940588f18eb5cc438c8520303bebc543db
---> 86c966e42457
-STEP 7/12: RUN .venv/bin/python -m ensurepip &&     .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf
-Looking in links: /tmp/tmpjq3fedc3
-Requirement already satisfied: pip in /usr/lib/python3.12/site-packages (24.3.1)
-/bin/sh: .venv/bin/pip: not found
-Error: building at STEP "RUN .venv/bin/python -m ensurepip &&     .venv/bin/pip install --upgrade pip &&     .venv/bin/pip install ocrmypdf": while running runtime: exit status 127
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.*;
+
+public class MetadataExtractor {
+
+    public static void main(String[] args) throws IOException {
+        File file = new File("path/to/searchable.pdf");
+        PDDocument document = PDDocument.load(file);
+        PDFTextStripper stripper = new PDFTextStripper();
+
+        int pageCount = document.getNumberOfPages();
+
+        String firstName = null;
+        String dob = null;
+
+        // Step 1: Find value using label
+        for (int i = 1; i <= pageCount && (firstName == null || dob == null); i++) {
+            stripper.setStartPage(i);
+            stripper.setEndPage(i);
+            String text = stripper.getText(document);
+
+            if (firstName == null) {
+                firstName = extractValueByLabel(text, "First Name");
+            }
+            if (dob == null) {
+                dob = extractValueByLabel(text, "DOB");
+            }
+        }
+
+        System.out.println("Extracted First Name: " + firstName);
+        System.out.println("Extracted DOB: " + dob);
+
+        // Step 2: Find page numbers where the values occur
+        Set<Integer> firstNamePages = new HashSet<>();
+        Set<Integer> dobPages = new HashSet<>();
+
+        for (int i = 1; i <= pageCount; i++) {
+            stripper.setStartPage(i);
+            stripper.setEndPage(i);
+            String text = stripper.getText(document);
+
+            if (firstName != null && text.contains(firstName)) {
+                firstNamePages.add(i);
+            }
+            if (dob != null && text.contains(dob)) {
+                dobPages.add(i);
+            }
+        }
+
+        document.close();
+
+        System.out.println("First Name occurs on pages: " + firstNamePages);
+        System.out.println("DOB occurs on pages: " + dobPages);
+    }
+
+    private static String extractValueByLabel(String text, String label) {
+        Pattern pattern = Pattern.compile(label + "\\s*[:\\-]?\\s*([A-Za-z ,.'-]+)");
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+        return null;
+    }
+}
