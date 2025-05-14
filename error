@@ -10,27 +10,24 @@ ENV TZ=UTC
 # Switch to root user to install bash
 USER root
 
-# Install bash if necessary
-RUN apk add --no-cache bash
+# Install bash and python if necessary
+RUN apk add --no-cache bash python3 py3-pip
 
 # Set work directory
 WORKDIR /app
 
-# Copy OCR tools and venv
+# Copy OCR tools and necessary resources
 COPY --from=base /app /app
-COPY --from=base /app/.venv /app/.venv
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
 
-# Debugging step: list contents of /app/.venv/bin/ to check if pip exists
-RUN ls -la /app/.venv/bin/
+# Create a new Python virtual environment
+RUN python3 -m venv /app/.venv
 
-# Ensure pip is installed and upgrade it if necessary
-RUN /app/.venv/bin/python -m ensurepip --upgrade
+# Install dependencies into the virtual environment
+RUN /app/.venv/bin/pip install --upgrade pip && \
+    /app/.venv/bin/pip install -r /app/requirements.txt
 
-# Ensure dependencies are installed in the virtual environment
-RUN /app/.venv/bin/pip install -r /app/requirements.txt
-
-# Set envs
+# Set environment variables
 ENV PATH="/app/.venv/bin:$PATH"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH="$JAVA_HOME/bin:$PATH"
@@ -42,13 +39,8 @@ COPY target/classes/application-docker.properties application.properties
 # Expose the port
 EXPOSE 9040
 
-# Debugging step: list the contents of the virtual environment's bin directory to ensure the file exists
+# Debugging step: list the contents of the virtual environment's bin directory to ensure pip exists
 RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-getting this error
-
-[2/2] STEP 11/20: RUN /app/.venv/bin/python -m ensurepip --upgrade
-/bin/sh: /app/.venv/bin/python: not found
-Error: building at STEP "RUN /app/.venv/bin/python -m ensurepip --upgrade": while running runtime: exit status 127
