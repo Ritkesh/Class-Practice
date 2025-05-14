@@ -1,1 +1,7 @@
-/bin/bash: line 1: /app/.venv/bin/ocrmypdf: cannot execute: required file not found
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman run -it --entrypoint /bin/bash b3de7b52eff6
+WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+e2d8b2fd331d:/app# which ocrmypdf
+/app/.venv/bin/ocrmypdf
+e2d8b2fd331d:/app# ls -l /app/.venv/bin/ocrmypdf
+-rwxr-xr-x    1 100      101            220 May  6 08:30 /app/.venv/bin/ocrmypdf
+e2d8b2fd331d:/app# 
