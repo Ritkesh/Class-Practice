@@ -1,14 +1,196 @@
-ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman run -it --entrypoint /bin/bash b3de7b52eff6
-WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
-e2d8b2fd331d:/app# which ocrmypdf
-/app/.venv/bin/ocrmypdf
-e2d8b2fd331d:/app# ls -l /app/.venv/bin/ocrmypdf
--rwxr-xr-x    1 100      101            220 May  6 08:30 /app/.venv/bin/ocrmypdf
-e2d8b2fd331d:/app# 
-e2d8b2fd331d:/app# ldd /app/.venv/bin/ocrmypdf
-/lib/ld-musl-x86_64.so.1: /app/.venv/bin/ocrmypdf: Not a valid dynamic program
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build --platform=linux/arm64 -f Dockerfile -t dmsrepo.optum.com/dms/pdf-processing:2.3 .
+[1/3] STEP 1/4: FROM docker.repo1.uhc.com/alpine:latest AS base
+[1/3] STEP 2/4: ENV LANG=C.UTF-8
+--> 41f05f4c4ae0
+[1/3] STEP 3/4: ENV TZ=UTC
+--> 350f0596ea95
+[1/3] STEP 4/4: RUN apk add --no-cache   python3   zlib   bash
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
+209D4A95FFFF0000:error:0A000086:SSL routines:tls_post_process_server_certificate:certificate verify failed:ssl/statem/statem_clnt.c:2103:
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.21/main: Permission denied
+209D4A95FFFF0000:error:0A000086:SSL routines:tls_post_process_server_certificate:certificate verify failed:ssl/statem/statem_clnt.c:2103:
+WARNING: fetching https://dl-cdn.alpinelinux.org/alpine/v3.21/community: Permission denied
+ERROR: unable to select packages:
+  bash (no such package):
+    required by: world[bash]
+  python3 (no such package):
+    required by: world[python3]
+Error: building at STEP "RUN apk add --no-cache   python3   zlib   bash": while running runtime: exit status 2
 
-podman build -f Dockerfile --tag=dmsrepo.optum.com/dms/pdf-processing:1.0 .
-
-podman build --platform=linux/arm64 -f Dockerfile -t dmsrepo.optum.com/dms/pdf-processing:1.9 .
-
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build --platform=linux/arm64 -f Dockerfile -t dmsrepo.optum.com/dms/pdf-processing:2.3 .
+[1/3] STEP 1/4: FROM docker.repo1.uhc.com/alpine:latest AS base
+[1/3] STEP 2/4: ENV LANG=C.UTF-8
+--> Using cache 41f05f4c4ae0f5a07ec9157dcf0f7f7adc2d800cd1463c702f011b10fe643e26
+--> 41f05f4c4ae0
+[1/3] STEP 3/4: ENV TZ=UTC
+--> Using cache 350f0596ea95a9e2cd410969873aa2a37f261714eb7a990b2d7a7b439014b98f
+--> 350f0596ea95
+[1/3] STEP 4/4: RUN apk add --no-cache   python3   zlib   bash
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
+(1/18) Installing ncurses-terminfo-base (6.5_p20241006-r3)
+(2/18) Installing libncursesw (6.5_p20241006-r3)
+(3/18) Installing readline (8.2.13-r0)
+(4/18) Installing bash (5.2.37-r0)
+Executing bash-5.2.37-r0.post-install
+(5/18) Installing libbz2 (1.0.8-r6)
+(6/18) Installing libexpat (2.7.0-r0)
+(7/18) Installing libffi (3.4.7-r0)
+(8/18) Installing gdbm (1.24-r0)
+(9/18) Installing xz-libs (5.6.3-r1)
+(10/18) Installing libgcc (14.2.0-r4)
+(11/18) Installing libstdc++ (14.2.0-r4)
+(12/18) Installing mpdecimal (4.0.0-r0)
+(13/18) Installing libpanelw (6.5_p20241006-r3)
+(14/18) Installing sqlite-libs (3.48.0-r2)
+(15/18) Installing python3 (3.12.10-r0)
+(16/18) Installing python3-pycache-pyc0 (3.12.10-r0)
+(17/18) Installing pyc (3.12.10-r0)
+(18/18) Installing python3-pyc (3.12.10-r0)
+Executing busybox-1.37.0-r12.trigger
+OK: 52 MiB in 33 packages
+--> da656d29cdfb
+[2/3] STEP 1/11: FROM da656d29cdfb7380c678e2588941c67da0f47ef743e46e8068c0242036844556 AS builder
+[2/3] STEP 2/11: RUN apk add --no-cache     ca-certificates     git     python3-dev     py3-pyarrow     curl
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/aarch64/APKINDEX.tar.gz
+(1/118) Installing ca-certificates (20241121-r1)
+(2/118) Installing brotli-libs (1.1.0-r2)
+(3/118) Installing c-ares (1.34.5-r0)
+(4/118) Installing libunistring (1.2-r0)
+(5/118) Installing libidn2 (2.3.7-r0)
+(6/118) Installing nghttp2-libs (1.64.0-r0)
+(7/118) Installing libpsl (0.21.5-r3)
+(8/118) Installing zstd-libs (1.5.6-r2)
+(9/118) Installing libcurl (8.12.1-r1)
+(10/118) Installing curl (8.12.1-r1)
+(11/118) Installing pcre2 (10.43-r0)
+(12/118) Installing git (2.47.2-r0)
+(13/118) Installing git-init-template (2.47.2-r0)
+(14/118) Installing py3-pyarrow-pyc (18.1.0-r0)
+(15/118) Installing py3-cparser (2.22-r1)
+(16/118) Installing py3-cparser-pyc (2.22-r1)
+(17/118) Installing py3-cffi (1.17.1-r1)
+(18/118) Installing py3-cffi-pyc (1.17.1-r1)
+(19/118) Installing libgfortran (14.2.0-r4)
+(20/118) Installing openblas (0.3.28-r0)
+(21/118) Installing py3-numpy (2.1.3-r0)
+(22/118) Installing py3-numpy-pyc (2.1.3-r0)
+(23/118) Installing apache-arrow (18.1.0-r0)
+(24/118) Installing gflags (2.2.2-r2)
+(25/118) Installing libunwind (1.8.1-r0)
+(26/118) Installing glog (0.7.1-r1)
+(27/118) Installing lz4-libs (1.10.0-r0)
+(28/118) Installing abseil-cpp-raw-logging-internal (20240722.0-r0)
+(29/118) Installing abseil-cpp-crc-internal (20240722.0-r0)
+(30/118) Installing abseil-cpp-crc32c (20240722.0-r0)
+(31/118) Installing abseil-cpp-crc-cord-state (20240722.0-r0)
+(32/118) Installing abseil-cpp-strings-internal (20240722.0-r0)
+(33/118) Installing abseil-cpp-strings (20240722.0-r0)
+(34/118) Installing abseil-cpp-cord-internal (20240722.0-r0)
+(35/118) Installing abseil-cpp-exponential-biased (20240722.0-r0)
+(36/118) Installing abseil-cpp-cordz-functions (20240722.0-r0)
+(37/118) Installing abseil-cpp-spinlock-wait (20240722.0-r0)
+(38/118) Installing abseil-cpp-base (20240722.0-r0)
+(39/118) Installing abseil-cpp-time-zone (20240722.0-r0)
+(40/118) Installing abseil-cpp-time (20240722.0-r0)
+(41/118) Installing abseil-cpp-kernel-timeout-internal (20240722.0-r0)
+(42/118) Installing abseil-cpp-malloc-internal (20240722.0-r0)
+(43/118) Installing abseil-cpp-debugging-internal (20240722.0-r0)
+(44/118) Installing abseil-cpp-stacktrace (20240722.0-r0)
+(45/118) Installing abseil-cpp-synchronization (20240722.0-r0)
+(46/118) Installing abseil-cpp-cordz-handle (20240722.0-r0)
+(47/118) Installing abseil-cpp-cordz-info (20240722.0-r0)
+(48/118) Installing abseil-cpp-cord (20240722.0-r0)
+(49/118) Installing abseil-cpp-symbolize (20240722.0-r0)
+(50/118) Installing abseil-cpp-examine-stack (20240722.0-r0)
+(51/118) Installing abseil-cpp-city (20240722.0-r0)
+(52/118) Installing abseil-cpp-low-level-hash (20240722.0-r0)
+(53/118) Installing abseil-cpp-hash (20240722.0-r0)
+(54/118) Installing abseil-cpp-log-globals (20240722.0-r0)
+(55/118) Installing abseil-cpp-log-internal-globals (20240722.0-r0)
+(56/118) Installing abseil-cpp-int128 (20240722.0-r0)
+(57/118) Installing abseil-cpp-str-format-internal (20240722.0-r0)
+(58/118) Installing abseil-cpp-log-internal-format (20240722.0-r0)
+(59/118) Installing abseil-cpp-log-sink (20240722.0-r0)
+(60/118) Installing abseil-cpp-log-internal-log-sink-set (20240722.0-r0)
+(61/118) Installing abseil-cpp-log-internal-proto (20240722.0-r0)
+(62/118) Installing abseil-cpp-strerror (20240722.0-r0)
+(63/118) Installing abseil-cpp-log-internal-message (20240722.0-r0)
+(64/118) Installing abseil-cpp-die-if-null (20240722.0-r0)
+(65/118) Installing abseil-cpp-log-internal-nullguard (20240722.0-r0)
+(66/118) Installing abseil-cpp-log-internal-check-op (20240722.0-r0)
+(67/118) Installing abseil-cpp-log-internal-conditions (20240722.0-r0)
+(68/118) Installing abseil-cpp-raw-hash-set (20240722.0-r0)
+(69/118) Installing abseil-cpp-status (20240722.0-r0)
+(70/118) Installing abseil-cpp-statusor (20240722.0-r0)
+(71/118) Installing abseil-cpp-throw-delegate (20240722.0-r0)
+(72/118) Installing libprotobuf (24.4-r4)
+(73/118) Installing icu-data-en (74.2-r0)
+Executing icu-data-en-74.2-r0.post-install
+*
+* If you need ICU with non-English locales and legacy charset support, install
+* package icu-data-full.
+*
+(74/118) Installing icu-libs (74.2-r0)
+(75/118) Installing re2 (2024.07.02-r1)
+(76/118) Installing py3-pybind11 (2.13.6-r0)
+(77/118) Installing py3-pybind11-pyc (2.13.6-r0)
+(78/118) Installing py3-re2 (2024.07.02-r1)
+(79/118) Installing py3-re2-pyc (2024.07.02-r1)
+(80/118) Installing snappy (1.1.10-r2)
+(81/118) Installing utf8proc (2.9.0-r0)
+(82/118) Installing libarrow (18.1.0-r0)
+(83/118) Installing libarrow_acero (18.1.0-r0)
+(84/118) Installing libthrift (0.20.0-r1)
+(85/118) Installing libparquet (18.1.0-r0)
+(86/118) Installing libarrow_dataset (18.1.0-r0)
+(87/118) Installing grpc (1.62.1-r2)
+(88/118) Installing abseil-cpp-flags-commandlineflag (20240722.0-r0)
+(89/118) Installing abseil-cpp-flags-commandlineflag-internal (20240722.0-r0)
+(90/118) Installing abseil-cpp-flags-program-name (20240722.0-r0)
+(91/118) Installing abseil-cpp-flags-config (20240722.0-r0)
+(92/118) Installing abseil-cpp-flags-internal (20240722.0-r0)
+(93/118) Installing abseil-cpp-flags-marshalling (20240722.0-r0)
+(94/118) Installing abseil-cpp-flags-private-handle-accessor (20240722.0-r0)
+(95/118) Installing abseil-cpp-flags-reflection (20240722.0-r0)
+(96/118) Installing libgpr (1.62.1-r2)
+(97/118) Installing abseil-cpp-random-internal-randen-hwaes (20240722.0-r0)
+(98/118) Installing abseil-cpp-random-internal-platform (20240722.0-r0)
+(99/118) Installing abseil-cpp-random-internal-randen-hwaes-impl (20240722.0-r0)
+(100/118) Installing abseil-cpp-random-internal-randen-slow (20240722.0-r0)
+(101/118) Installing abseil-cpp-random-internal-randen (20240722.0-r0)
+(102/118) Installing abseil-cpp-random-internal-seed-material (20240722.0-r0)
+(103/118) Installing abseil-cpp-random-seed-gen-exception (20240722.0-r0)
+(104/118) Installing abseil-cpp-random-internal-pool-urbg (20240722.0-r0)
+(105/118) Installing libaddress_sorting (1.62.1-r2)
+(106/118) Installing libupb_base_lib (1.62.1-r2)
+(107/118) Installing libupb_mem_lib (1.62.1-r2)
+(108/118) Installing libupb_message_lib (1.62.1-r2)
+(109/118) Installing libupb_json_lib (1.62.1-r2)
+(110/118) Installing libupb_textformat_lib (1.62.1-r2)
+(111/118) Installing libgrpc (1.62.1-r2)
+(112/118) Installing libgrpc_unsecure (1.62.1-r2)
+(113/118) Installing libprotoc (24.4-r4)
+(114/118) Installing grpc-cpp (1.62.1-r2)
+(115/118) Installing libarrow_flight (18.1.0-r0)
+(116/118) Installing py3-pyarrow (18.1.0-r0)
+(117/118) Installing pkgconf (2.3.0-r0)
+(118/118) Installing python3-dev (3.12.10-r0)
+Executing busybox-1.37.0-r12.trigger
+Executing ca-certificates-20241121-r1.trigger
+OK: 276 MiB in 151 packages
+--> af361d566f63
+[2/3] STEP 3/11: WORKDIR /app
+--> c578bd790e7e
+[2/3] STEP 4/11: COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
+--> 6da08623e19f
+[2/3] STEP 5/11: ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+--> 6286d171a62b
+[2/3] STEP 6/11: RUN uv venv --system-site-packages .venv
+Using CPython 3.12.10 interpreter at: /usr/bin/python
+Creating virtual environment at: .venv
+--> e2e91460499f
+[2/3] STEP 7/11: COPY uv.lock uv.lock
+Error: building at STEP "COPY uv.lock uv.lock": checking on sources under "/var/tmp/libpod_builder2359380475/build": copier: stat: "/uv.lock": no such file or directory
