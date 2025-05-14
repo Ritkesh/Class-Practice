@@ -47,3 +47,8 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+getting error
+
+[2/2] STEP 9/19: COPY requirements.txt /app/
+Error: building at STEP "COPY requirements.txt /app/": checking on sources under "/var/tmp/libpod_builder2339742384/build": copier: stat: "/requirements.txt": no such file or directory
+
