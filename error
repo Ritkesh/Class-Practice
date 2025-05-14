@@ -1,50 +1,32 @@
 # OCR base image with Python virtual env
 FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
 
-# Java base image
 FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
 
 ENV LANG=C.UTF-8
 ENV TZ=UTC
 
-# Switch to root user to install bash
 USER root
 
-# Install bash and python if necessary
 RUN apk add --no-cache bash python3 py3-pip
 
-# Set work directory
 WORKDIR /app
 
-# Copy OCR tools and necessary resources from the base image
 COPY --from=base /app /app
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
 
-# Ensure the requirements.txt file is copied into the Docker image
-# Adjust this path if requirements.txt is located elsewhere
-COPY requirements.txt /app/
+# (Removed: COPY requirements.txt /app/)
+# (Removed: pip install -r /app/requirements.txt)
 
-# Create a new Python virtual environment
-RUN python3 -m venv /app/.venv
-
-# Install dependencies into the virtual environment
-RUN /app/.venv/bin/pip install --upgrade pip && \
-    /app/.venv/bin/pip install -r /app/requirements.txt
-
-# Set environment variables
 ENV PATH="/app/.venv/bin:$PATH"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
-# Copy app JAR and config
 COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
 COPY target/classes/application-docker.properties application.properties
 
-# Expose the port
 EXPOSE 9040
 
-# Debugging step: list the contents of the virtual environment's bin directory to ensure pip exists
 RUN ls -la /app/.venv/bin/
 
-# Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
