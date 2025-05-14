@@ -1,51 +1,39 @@
 # OCR base image with Python virtual env
 FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
 
+# Java base image
 FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
 
 ENV LANG=C.UTF-8
 ENV TZ=UTC
 
+# Switch to root user to install bash
 USER root
 
-RUN apk add --no-cache bash python3 py3-pip
+# Install bash and other tools
+RUN apk add --no-cache bash
 
+# Set working directory
 WORKDIR /app
 
+# Copy OCR tools and prebuilt Python venv
 COPY --from=base /app /app
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
 
-# (Removed: COPY requirements.txt /app/)
-# (Removed: pip install -r /app/requirements.txt)
-
+# Set environment variables for Python & Java
 ENV PATH="/app/.venv/bin:$PATH"
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
+# Copy JAR and Spring config
 COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
 COPY target/classes/application-docker.properties application.properties
 
+# Expose Spring Boot port
 EXPOSE 9040
 
+# Debugging: list Python binaries
 RUN ls -la /app/.venv/bin/
 
+# Start Java app
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
-
-while running the image getting this error
-
-
-
-Traceback (most recent call last):
-2025-05-14T13:36:46.994Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/bin/ocrmypdf", line 5, in <module>
-2025-05-14T13:36:46.994Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from ocrmypdf.__main__ import run
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/src/ocrmypdf/__init__.py", line 10, in <module>
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from ocrmypdf import helpers, hocrtransform, pdfa, pdfinfo
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/src/ocrmypdf/helpers.py", line 26, in <module>
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     import img2pdf
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/lib/python3.12/site-packages/img2pdf.py", line 25, in <module>
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from PIL import Image, TiffImagePlugin, GifImagePlugin, ImageCms
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/lib/python3.12/site-packages/PIL/Image.py", line 97, in <module>
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from . import _imaging as core
-2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    : ImportError: cannot import name '_imaging' from 'PIL' (/app/.venv/lib/python3.12/site-packages/PIL/__init__.py)
-
