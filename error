@@ -47,3 +47,8 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+getting this error
+
+[2/2] STEP 11/20: RUN /app/.venv/bin/python -m ensurepip --upgrade
+/bin/sh: /app/.venv/bin/python: not found
+Error: building at STEP "RUN /app/.venv/bin/python -m ensurepip --upgrade": while running runtime: exit status 127
