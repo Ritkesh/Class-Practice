@@ -21,8 +21,11 @@ COPY --from=base /app /app
 COPY --from=base /app/.venv /app/.venv
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
 
-# Ensure the virtual environment has executable permissions (after copying)
-RUN chmod -R +x /app/.venv/bin/
+# Debugging step: list contents of /app/.venv/bin/ to check if pip exists
+RUN ls -la /app/.venv/bin/
+
+# Ensure pip is installed and upgrade it if necessary
+RUN /app/.venv/bin/python -m ensurepip --upgrade
 
 # Ensure dependencies are installed in the virtual environment
 RUN /app/.venv/bin/pip install -r /app/requirements.txt
@@ -44,10 +47,3 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-
-getting this error
-
-[2/2] STEP 11/19: RUN /app/.venv/bin/pip install -r /app/requirements.txt
-/bin/sh: /app/.venv/bin/pip: not found
-Error: building at STEP "RUN /app/.venv/bin/pip install -r /app/requirements.txt": while running runtime: exit status 127
-
