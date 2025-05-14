@@ -31,4 +31,6 @@ COPY target/classes/application-docker.properties application.properties
 EXPOSE 9040
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-and getting this error  Error: creating build container: initializing source docker://docker.repo1.uhc.com/ecp/base-java17-image:latest-master: pinging container registry docker.repo1.uhc.com: Get "https://docker.repo1.uhc.com/v2/": dial tcp: lookup docker.repo1.uhc.com: no such host
+getting this error
+2025-05-14T12:52:56.158Z  INFO 1 --- [nio-9040-exec-1] c.o.dms.pdfprocess.service.OcrHandler    : /bin/bash: line 1: /app/.venv/bin/ocrmypdf: cannot execute: required file not found
+but this file is present
