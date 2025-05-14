@@ -30,3 +30,22 @@ EXPOSE 9040
 RUN ls -la /app/.venv/bin/
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+
+while running the image getting this error
+
+
+
+Traceback (most recent call last):
+2025-05-14T13:36:46.994Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/bin/ocrmypdf", line 5, in <module>
+2025-05-14T13:36:46.994Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from ocrmypdf.__main__ import run
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/src/ocrmypdf/__init__.py", line 10, in <module>
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from ocrmypdf import helpers, hocrtransform, pdfa, pdfinfo
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/src/ocrmypdf/helpers.py", line 26, in <module>
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     import img2pdf
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/lib/python3.12/site-packages/img2pdf.py", line 25, in <module>
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from PIL import Image, TiffImagePlugin, GifImagePlugin, ImageCms
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :   File "/app/.venv/lib/python3.12/site-packages/PIL/Image.py", line 97, in <module>
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    :     from . import _imaging as core
+2025-05-14T13:36:46.995Z  INFO 1 --- [nio-9040-exec-5] c.o.dms.pdfprocess.service.OcrHandler    : ImportError: cannot import name '_imaging' from 'PIL' (/app/.venv/lib/python3.12/site-packages/PIL/__init__.py)
+
