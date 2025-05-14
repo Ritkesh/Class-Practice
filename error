@@ -1,36 +1,15 @@
-# OCR base image with Python virtual env
-FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
-
-# Java base image
-FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
-
-ENV LANG=C.UTF-8
-ENV TZ=UTC
-
-RUN apk add --no-cache \
-    bash
-
-WORKDIR /app
-
-# Copy OCR tools and venv
-COPY --from=base /app /app
-COPY --from=base /app/.venv /app/.venv
-COPY --from=base /usr/share/tessdata /usr/share/tessdata
-
-# Optional: only if needed from base
-# COPY --from=base /usr/lib/jvm/java-17-openjdk /usr/lib/jvm/java-17-openjdk
-# COPY --from=base /lib /lib
-# COPY --from=base /usr/lib /usr/lib
-
-# Set envs
-ENV PATH="/app/.venv/bin:$PATH"
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-ENV PATH="$JAVA_HOME/bin:$PATH"
-
-# Copy app JAR and config
-COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
-COPY target/classes/application-docker.properties application.properties
-
-EXPOSE 9040
-
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build -f Dockerfile --tag=dmsrepo.optum.com/dms/pdf-processing:2.2
+[1/2] STEP 1/1: FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
+--> 409603a08b00
+[2/2] STEP 1/15: FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
+WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+[2/2] STEP 2/15: ENV LANG=C.UTF-8
+--> Using cache 6503d32af4a693d14f4f3dbbaa163fe4361c243a0f85012fe5462bc43c7280f9
+--> 6503d32af4a6
+[2/2] STEP 3/15: ENV TZ=UTC
+--> Using cache 18e574923cb7c3278ed8b4c2a7d3165680bffa8eab30170aaae76e19eee55bdf
+--> 18e574923cb7
+[2/2] STEP 4/15: RUN apk add --no-cache     bash
+ERROR: Unable to lock database: Permission denied
+ERROR: Failed to open apk database: Permission denied
+Error: building at STEP "RUN apk add --no-cache     bash": while running runtime: exit status 99
