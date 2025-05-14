@@ -44,3 +44,9 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+getting this error
+
+[2/2] STEP 6/19: RUN chmod -R +x /app/.venv/bin/
+chmod: /app/.venv/bin/: No such file or directory
+Error: building at STEP "RUN chmod -R +x /app/.venv/bin/": while running runtime: exit status 1
+
