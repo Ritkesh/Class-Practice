@@ -8,3 +8,4 @@ e2d8b2fd331d:/app#
 e2d8b2fd331d:/app# ldd /app/.venv/bin/ocrmypdf
 /lib/ld-musl-x86_64.so.1: /app/.venv/bin/ocrmypdf: Not a valid dynamic program
 
+podman build -f Dockerfile --tag=dmsrepo.optum.com/dms/pdf-processing:1.0 .
