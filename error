@@ -44,3 +44,9 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+getting error
+
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: '/app/requirements.txt'
+Error: building at STEP "RUN /app/.venv/bin/pip install --upgrade pip &&     /app/.venv/bin/pip install -r /app/requirements.txt": while running runtime: exit status 1
+
