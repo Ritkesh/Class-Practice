@@ -1,4 +1,268 @@
-STEP 7/12: RUN java --version
-openjdk 17.0.15 2025-04-15
-OpenJDK Runtime Environment (build 17.0.15+6-alpine-r0)
-OpenJDK 64-Bit Server VM (build 17.0.15+6-alpine-r0, mixed mode, sharing)
+package com.optum.dms.pdfprocess.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.optum.dms.pdfprocess.entity.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.*;
+import java.net.URI;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+@Slf4j
+
+@Service
+public class OcrHandler {
+    @Value("${process.timeout.seconds}")
+    private long processTimeoutSeconds;
+    @Value("${application.user}")
+    private String user;
+    @Value("${pdf.url}")
+    private String pdfUrl;
+    @Value("${nuxeo.username}")
+    private String username;
+    @Value("${nuxeo.password}")
+    private String password;
+    @Value("${file.url}")
+    private String fileUrl;
+    @Value("${nuxeo.file.path}")
+    private String path;
+
+    @Autowired
+    PdfMetadataExtractorService pdfMetadataExtractorService;
+    @Autowired
+    TestPdfMetadataExtractorService testPdfMetadataExtractorService;
+
+
+
+    public ResponseEntity<?> processPdfTest(String chartId) {
+        log.info("Received request to process PDF: {}");
+
+        try {
+//                File sourceFile = getmmrFile(chartId, user);
+                File sourceFile = new File("/Users/ritkesh_singh@optum.com/Downloads","Sample_MedicalRecord_Veradigm_Office_Visit_v4_PDF_20240417.pdf");
+                if (!sourceFile.exists()) {
+                    log.error("source PDF not found: {}", sourceFile.getAbsolutePath());
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                } else{
+                    log.info("Loading PDF from source path: {}", sourceFile.getAbsolutePath());
+                    byte[]pdfBytes = Files.readAllBytes(sourceFile.toPath());
+                    File inputPdf = File.createTempFile("input", ".pdf");
+                    try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
+                        fos.write(pdfBytes);
+                    }
+                    File outputPdf = File.createTempFile("output", "_linearized.pdf");
+
+                    String ocrCommand = String.format(
+                            "ocrmypdf --force-ocr --rotate-pages --deskew --jobs 4 \"%s\" \"%s\"",
+                            inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
+                    );
+
+                    log.info("Executing ocrmypdf command: {}", ocrCommand);
+
+                    ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", ocrCommand);
+                    processBuilder.redirectErrorStream(true);
+                    Process process = processBuilder.start();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            log.info(line);
+                        }
+                    }
+                    boolean finished = process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS);
+                    if (!finished) {
+                        process.destroy();
+                        log.error("ocrmypdf process timed out");
+                        return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+                    }else if (process.exitValue() != 0) {
+                        log.error("ocrmypdf process failed with exit code {}", process.exitValue());
+                        return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+                    } else{
+
+                        log.info("ocrmypdf process completed successfully. Uploading...");
+                        uploadToNuxeoClient(outputPdf,path);
+            pdfMetadataExtractorService.getMetaData(outputPdf);
+//                        testPdfMetadataExtractorService.getMetaData(outputPdf);
+                    }
+                }
+
+        } catch (IOException | InterruptedException e) {
+            log.error("Error processing PDF: {}", e.getMessage());
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
+
+    public void uploadToNuxeoClient(File file, String path) {
+        try {
+            String batchId = getBatchId();
+            if(batchId!=null){
+                uploadFile(batchId, file);
+                checkUploadStatus(batchId);
+                createDocument(path, batchId, file);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getBatchId() throws JsonProcessingException {
+        String url = fileUrl+"/upload";
+        HttpHeaders headers = createAuthHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode node = objectMapper.readTree(response.getBody());
+        System.out.println("BatchId:" + node.path("batchId").asText());
+        return node.path("batchId").asText();
+    }
+
+
+    public void uploadFile(String batchId, File file) throws IOException {
+        try{
+            String url = fileUrl+"upload/" + batchId + "/0";
+            HttpHeaders headers = createAuthHeaders();
+            headers.set("cookie","SERVERID=nuxeodev_s1|aA+XR|aA+Wb");
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.set("X-Upload-Type","normal");
+            headers.set("X-File-Name",file.getName());
+
+            byte[] fileBytes = Files.readAllBytes(file.toPath());
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<?> requestEntity = new HttpEntity<>(fileBytes, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            System.out.println("upload request:" + requestEntity.getBody());
+
+            System.out.println("Upload response: " + response.getBody());
+            System.out.println("Status:" + response.getStatusCode());
+        } catch (Error e){
+            log.error("Error while uploading file to nuxeo"+":"+e.getMessage());
+        }
+    }
+
+
+
+    private void checkUploadStatus(String batchId) {
+        String url = fileUrl+"upload/" + batchId;
+        HttpHeaders headers = createAuthHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+    }
+
+    private void createDocument(String path, String batchId, File file) {
+        String url = fileUrl+"path/" + path;
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NXproperties","*");
+        headers.set("X-NXRepository","default");
+
+        FileContent fileContent = new FileContent(batchId,"0");
+        FileProperties fileProperties = new FileProperties(file.getName(), fileContent);
+        Document request = new Document("document", file.getName(), "File",fileProperties);
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            String requestBody = mapper.writeValueAsString(request);
+            System.out.println("new request body for create document:" + requestBody);
+            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            System.out.println("Upload response: " + response.getBody());
+            System.out.println("Status :" +response.getStatusCode());
+
+        } catch (JsonProcessingException e) {
+            log.error("error while creating document"+":"+e.getMessage());
+        }
+    }
+
+
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic " + encodeCredentials(username, password));
+        headers.set("X-Upload-Type", "normal"); // Important for Nuxeo
+        return headers;
+    }
+
+    private String encodeCredentials(String username, String password) {
+        String credentials = username + ":" + password;
+        return Base64.getEncoder().encodeToString(credentials.getBytes());
+    }
+
+    private void saveFileLocally(File file) throws IOException{
+        File directory = new File("/");
+        if(!directory.exists()){
+            directory.mkdirs();
+        }
+        File localFile = new File(directory,file.getName());
+        Files.copy(file.toPath(),localFile.toPath());
+    }
+
+
+
+    public File getmmrFile(String chartId, String user) throws IOException {
+        String url = pdfUrl + chartId + "&user=" + user;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_OCTET_STREAM));
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Resource> response = restTemplate.exchange(
+                URI.create(url),
+                HttpMethod.GET,
+                entity,
+                Resource.class
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            File tempFile = File.createTempFile("temp",".pdf");
+            try (
+                    InputStream in = response.getBody().getInputStream();
+
+                    FileOutputStream out = new FileOutputStream(tempFile)
+            ) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                System.out.println("Temporary file created at: " + tempFile.getAbsolutePath());
+                return tempFile;
+            } catch (IOException e) {
+                log.error("Error while getting mmrfile"+":"+e.getMessage());
+            }
+        }
+
+        throw new RuntimeException("Failed to create temp file from API");
+    }
+
+}
