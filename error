@@ -16,11 +16,12 @@ RUN apk add --no-cache bash python3 py3-pip
 # Set work directory
 WORKDIR /app
 
-# Copy OCR tools and necessary resources
+# Copy OCR tools and necessary resources from the base image
 COPY --from=base /app /app
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
 
 # Ensure the requirements.txt file is copied into the Docker image
+# Adjust this path if requirements.txt is located elsewhere
 COPY requirements.txt /app/
 
 # Create a new Python virtual environment
@@ -47,8 +48,3 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-getting error
-
-[2/2] STEP 9/19: COPY requirements.txt /app/
-Error: building at STEP "COPY requirements.txt /app/": checking on sources under "/var/tmp/libpod_builder2339742384/build": copier: stat: "/requirements.txt": no such file or directory
-
