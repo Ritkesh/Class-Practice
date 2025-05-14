@@ -1,1 +1,26 @@
-FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS builder
+FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
+
+ENV LANG=C.UTF-8
+ENV TZ=UTC
+
+# Install tools not already in the base image
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        bash \
+        ghostscript \
+        unpaper \
+        tesseract-ocr \
+        tesseract-ocr-eng \
+        tesseract-ocr-osd \
+        tesseract-ocr-fra \
+        tesseract-ocr-deu \
+        tesseract-ocr-por \
+        tesseract-ocr-spa \
+        tesseract-ocr-chi-sim \
+        jbig2dec \
+        pngquant \
+        fonts-dejavu && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy the app + Python virtualenv from Alpine
+COPY --from=alpine-python /app /app
