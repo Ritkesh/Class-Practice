@@ -13,9 +13,6 @@ USER root
 # Install bash if necessary
 RUN apk add --no-cache bash
 
-# Ensure the virtual environment has executable permissions
-RUN chmod -R +x /app/.venv/bin/
-
 # Set work directory
 WORKDIR /app
 
@@ -23,6 +20,9 @@ WORKDIR /app
 COPY --from=base /app /app
 COPY --from=base /app/.venv /app/.venv
 COPY --from=base /usr/share/tessdata /usr/share/tessdata
+
+# Ensure the virtual environment has executable permissions (after copying)
+RUN chmod -R +x /app/.venv/bin/
 
 # Ensure dependencies are installed in the virtual environment
 RUN /app/.venv/bin/pip install -r /app/requirements.txt
@@ -44,9 +44,3 @@ RUN ls -la /app/.venv/bin/
 
 # Entry point
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-getting this error
-
-[2/2] STEP 6/19: RUN chmod -R +x /app/.venv/bin/
-chmod: /app/.venv/bin/: No such file or directory
-Error: building at STEP "RUN chmod -R +x /app/.venv/bin/": while running runtime: exit status 1
-
