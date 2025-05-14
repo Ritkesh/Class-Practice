@@ -7,6 +7,9 @@ FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
 ENV LANG=C.UTF-8
 ENV TZ=UTC
 
+RUN apk add --no-cache \
+    bash
+
 WORKDIR /app
 
 # Copy OCR tools and venv
@@ -26,7 +29,7 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Copy app JAR and config
 COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
-COPY target/application-docker.properties application.properties
+COPY target/classes/application-docker.properties application.properties
 
 EXPOSE 9040
 
