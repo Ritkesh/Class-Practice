@@ -1,3 +1,26 @@
+
+FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
+
+ENV LANG=C.UTF-8
+ENV TZ=UTC
+ENV CACHE_BUSTER=1
+RUN apk add --no-cache \
+    bash \
+    openjdk17
+ RUN bash --version
+ RUN java --version
+# # Install uv if not installed
+# COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
+# # Create the virtual environment
+# RUN uv venv --system-site-packages .venv
+#
+# # Install pip manually inside the virtualenv
+# RUN uv pip install --upgrade pip && \
+#     uv pip install ocrmypdf
+
+
+
+
 FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
 
 ENV LANG=C.UTF-8
@@ -24,3 +47,44 @@ RUN apt-get update && \
 
 # Copy the app + Python virtualenv from Alpine
 COPY --from=alpine-python /app /app
+
+
+WORKDIR /app
+
+# # Copy the application JAR file to the container
+COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
+
+# # Copy the application-docker.properties file to the container
+COPY src/main/resources/application-docker.properties application.properties
+
+# # Expose the port the application runs on
+EXPOSE 9040
+
+# Run the application
+# ENTRYPOINT ["/app/.venv/bin/ocrmypdf"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# podman build -f Dockerfile --tag=docker.optum.com/dms/pdf-processing:1.0 .
+
+
+while building this docker file getting error shring the log
+
+
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman build -f Dockerfile --tag=dmsrepo.optum.com/dms/pdf-processing:1.9 .
+[2/2] STEP 1/10: FROM docker.repo1.uhc.com/ecp/base-java17-image:latest-master AS final
+Trying to pull docker.repo1.uhc.com/ecp/base-java17-image:latest-master...
+Getting image source signatures
+Copying blob sha256:3f967e8cad309339841719d9ce4ad5951964c5b2700da5769e26662365ee96b6
+Copying blob sha256:f18232174bc91741fdf3da96d85011092101a032a93a388b79e99e69c2d5c870
+Copying blob sha256:1395e536b0c47a70b9e12809f00dcba02e6692fbf28938ac307c05fab3fce2ba
+Copying blob sha256:3b1f6a33fb6e15732144ba589db2070f7cffc9c8224602f38463fc978452975c
+Copying config sha256:a0a848de1fb6e42dcff2de47f223da0afea484b90729d39e8ec068c39c0af696
+Writing manifest to image destination
+WARNING: image platform (linux/amd64) does not match the expected platform (linux/arm64)
+[2/2] STEP 2/10: ENV LANG=C.UTF-8
+--> 6503d32af4a6
+[2/2] STEP 3/10: ENV TZ=UTC
+--> 18e574923cb7
+[2/2] STEP 4/10: RUN apt-get update &&     apt-get install -y --no-install-recommends         bash         ghostscript         unpaper         tesseract-ocr         tesseract-ocr-eng         tesseract-ocr-osd         tesseract-ocr-fra         tesseract-ocr-deu         tesseract-ocr-por         tesseract-ocr-spa         tesseract-ocr-chi-sim         jbig2dec         pngquant         fonts-dejavu &&     apt-get clean && rm -rf /var/lib/apt/lists/*
+/bin/sh: apt-get: not found
+Error: building at STEP "RUN apt-get update &&     apt-get install -y --no-install-recommends         bash         ghostscript         unpaper         tesseract-ocr         tesseract-ocr-eng         tesseract-ocr-osd         tesseract-ocr-fra         tesseract-ocr-deu         tesseract-ocr-por         tesseract-ocr-spa         tesseract-ocr-chi-sim         jbig2dec         pngquant         fonts-dejavu &&     apt-get clean && rm -rf /var/lib/apt/lists/*": while running runtime: exit status 127
+
