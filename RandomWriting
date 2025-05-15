@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class PdfMetadataExtractorService {
-    static Map<String,String>labelExisted = new HashMap<>();
     private static final List<DateTimeFormatter> DATE_FORMATS = List.of(
 //            DateTimeFormatter.ofPattern("d/M/yyyy"),  // Added format for single-digit day and month
 //            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
@@ -47,6 +46,7 @@ public class PdfMetadataExtractorService {
     public Map<String, List<PdfMetaData>> getMetaData(File file) throws IOException {
         PDDocument document = PDDocument.load(file);
         Map<String, List<PdfMetaData>> metadata = new HashMap<>();
+         Map<String,String>labelExisted = new HashMap<>();
 
         Properties properties = new Properties();
 //        properties.load(new FileInputStream("src/main/resources/application.properties"));
@@ -154,12 +154,12 @@ public class PdfMetadataExtractorService {
         for (String label : labels) {
 //            if (label.equalsIgnoreCase("Patient Name")) {
             // Custom regex to handle common variations and dynamic trailing text without the length restriction
+            Pattern pattern =Pattern.compile("");
             if(labelExisted.containsKey(label)){
-                Pattern pattern = Pattern.compile("(?i)"+Pattern.quote(labelExisted.get(label))+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+                 String value = labelExisted.get(label);
+                 addToMetadataList(metadata,key,value,page);
             } else{
-                Pattern pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
-            }
-                Pattern pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+                 pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
                 Matcher matcher = pattern.matcher(text);
                 while (matcher.find()) {
                     String value = matcher.group(1).trim().replaceAll("\\s+", " ");
@@ -167,6 +167,8 @@ public class PdfMetadataExtractorService {
                     log.info("Matched patient name: {}", value);
                     addToMetadataList(metadata, key, value, page);
                 }
+            }
+
 //                continue; // Skip default logic for this label
 //            }
 
