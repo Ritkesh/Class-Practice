@@ -1,3 +1,1 @@
-pattern = Pattern.compile("(?i)"+Pattern.quote(labelExisted.get(label))+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
-
-Donot read next line and donot read white space more than 1
+pattern = Pattern.compile("(?i)" + Pattern.quote(labelExisted.get(label)) + "\\s*[:\\-]?\\s*([A-Z'\\-\\.]+(?: [A-Z'\\-\\.]+)*)");
