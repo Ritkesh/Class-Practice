@@ -1,45 +1,48 @@
 import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
+import com.hierynomus.smbj.share.File;
+import com.hierynomus.smbj.share.SMB2CreateDisposition;
+import com.hierynomus.smbj.share.SMB2CreateOptions;
+import com.hierynomus.smbj.share.SMB2ShareAccess;
+import com.hierynomus.smbj.share.AccessMask;
+import com.hierynomus.smbj.share.FileAttributes;
 
 import java.io.InputStream;
+import java.util.EnumSet;
 
 public class SmbjExample {
     public static void main(String[] args) throws Exception {
         SMBClient client = new SMBClient();
 
         try (Connection connection = client.connect("wn000129907")) {
-            Session session = connection.authenticate(
-                new com.hierynomus.smbj.auth.AuthenticationContext("username", "password".toCharArray(), null)
-            );
+            AuthenticationContext authContext = new AuthenticationContext("username", "password".toCharArray(), null);
+            Session session = connection.authenticate(authContext);
 
             try (DiskShare share = (DiskShare) session.connectShare("DMS-TEAM")) {
-                if (share.fileExists("ocrMyPDF/sample.pdf")) {
-                    try (InputStream is = share.openFile(
-                        "ocrMyPDF/sample.pdf",
-                        com.hierynomus.smbj.share.AccessMask.GENERIC_READ,
+                String filePath = "ocrMyPDF/sample.pdf";
+                
+                if (share.fileExists(filePath)) {
+                    File file = share.openFile(
+                        filePath,
+                        EnumSet.of(AccessMask.GENERIC_READ),
                         null,
-                        com.hierynomus.smbj.share.ShareAccess.ALL,
-                        com.hierynomus.smbj.share.FileAttributes.FILE_ATTRIBUTE_NORMAL,
-                        com.hierynomus.smbj.share.SMB2CreateDisposition.FILE_OPEN).getInputStream()) {
+                        EnumSet.of(SMB2ShareAccess.READ),
+                        FileAttributes.FILE_ATTRIBUTE_NORMAL,
+                        SMB2CreateDisposition.FILE_OPEN,
+                        EnumSet.noneOf(SMB2CreateOptions.class)
+                    );
 
+                    try (InputStream is = file.getInputStream()) {
                         // Read and process input stream here
+                        System.out.println("File opened successfully!");
                     }
+                } else {
+                    System.out.println("File not found: " + filePath);
                 }
             }
         }
     }
 }
-
-
-
-
-
-
-
-<dependency>
-  <groupId>com.hierynomus</groupId>
-  <artifactId>smbj</artifactId>
-  <version>0.11.4</version>
-</dependency>
