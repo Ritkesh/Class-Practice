@@ -1,0 +1,45 @@
+import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.Session;
+import com.hierynomus.smbj.share.DiskShare;
+
+import java.io.InputStream;
+
+public class SmbjExample {
+    public static void main(String[] args) throws Exception {
+        SMBClient client = new SMBClient();
+
+        try (Connection connection = client.connect("wn000129907")) {
+            Session session = connection.authenticate(
+                new com.hierynomus.smbj.auth.AuthenticationContext("username", "password".toCharArray(), null)
+            );
+
+            try (DiskShare share = (DiskShare) session.connectShare("DMS-TEAM")) {
+                if (share.fileExists("ocrMyPDF/sample.pdf")) {
+                    try (InputStream is = share.openFile(
+                        "ocrMyPDF/sample.pdf",
+                        com.hierynomus.smbj.share.AccessMask.GENERIC_READ,
+                        null,
+                        com.hierynomus.smbj.share.ShareAccess.ALL,
+                        com.hierynomus.smbj.share.FileAttributes.FILE_ATTRIBUTE_NORMAL,
+                        com.hierynomus.smbj.share.SMB2CreateDisposition.FILE_OPEN).getInputStream()) {
+
+                        // Read and process input stream here
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+<dependency>
+  <groupId>com.hierynomus</groupId>
+  <artifactId>smbj</artifactId>
+  <version>0.11.4</version>
+</dependency>
