@@ -1,5 +1,64 @@
-ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % /opt/homebrew/opt/samba/bin/smbclient //wn000129907/DMS-TEAM -U ritkesh_singh@optum.com
-Can't load /opt/homebrew/etc/smb.conf - run testparm to debug it
-Password for [ritkesh_singh@optum.com]:
-Try "help" to get a list of possible commands.
-smb: \> 
+package com.optum.dms.pdfprocess.service;
+
+import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msfscc.FileAttributes;
+import com.hierynomus.mssmb2.SMB2CreateDisposition;
+import com.hierynomus.mssmb2.SMB2CreateOptions;
+import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.Session;
+import com.hierynomus.smbj.share.DiskShare;
+import com.hierynomus.smbj.share.File;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.util.EnumSet;
+
+@Service
+
+public class OcrPdfService {
+    public java.io.File getTestFile() throws Exception {
+        SMBClient client = new SMBClient();
+
+        java.io.File tempfile = null;
+
+
+        try (Connection connection = client.connect("wn000129907")) {
+            AuthenticationContext authContext = new AuthenticationContext("ritkesh_singh@optum.com", "SuruchiRaja1991@".toCharArray(), null);
+            Session session = connection.authenticate(authContext);
+
+            try (DiskShare share = (DiskShare) session.connectShare("DMS-TEAM")) {
+                String filePath = "ocrMyPDF/Sample_MedicalRecord_Athena_Office_Visit_v1_PDF_20250325.pdf";
+
+                if (share.fileExists(filePath)) {
+                     File file = share.openFile(
+                            filePath,
+                            EnumSet.of(AccessMask.GENERIC_READ),
+                            EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
+                            EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                            SMB2CreateDisposition.FILE_OPEN,
+                            EnumSet.noneOf(SMB2CreateOptions.class)
+                    );
+                    tempfile= java.io.File.createTempFile("test-",".pdf");
+
+                    try (InputStream is = file.getInputStream()) {
+                        // Read and process input stream here
+                        OutputStream out = new FileOutputStream(tempfile);
+                        byte[] buffer = new byte[8192];
+                        int bytesread;
+                        while ((bytesread = is.read(buffer))!=-1){
+                            out.write(buffer,0,bytesread);
+                        }
+                        System.out.println("File opened successfully!");
+                    }
+                } else {
+                    System.out.println("File not found: " + filePath);
+                }
+            }
+        }
+        return tempfile;
+    }
+}
+
