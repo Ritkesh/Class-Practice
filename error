@@ -1,1 +1,22 @@
-Patient Name: Robin E Hood Date of Birth: 09/11/20
+            Pattern pattern =Pattern.compile("");
+            if(labelExisted.containsKey(label)){
+                pattern = Pattern.compile("(?i)" + Pattern.quote(labelExisted.get(label)) + "\\s*[:\\-]?\\s*([A-Z'\\-\\.]+(?: [A-Z'\\-\\.]+)*)");
+                Matcher matcher = pattern.matcher(text);
+                while (matcher.find()) {
+                    String value = labelExisted.get(label);
+                    log.info("Matched DOB: {}", value);
+                    addToMetadataList(metadata, key, value, page);
+                    break;
+                }
+
+            } else {
+                 pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z0-9'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+                Matcher matcher = pattern.matcher(text);
+                 while (matcher.find()) {
+                    String value = matcher.group(1).trim().replaceAll("\\s+", " ");
+                    labelExisted.put(label,value);
+                    log.info("Matched DOB: {}", value);
+                    addToMetadataList(metadata, key, value, page);
+                    break;
+                }
+            }
