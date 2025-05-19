@@ -1,1 +1,3 @@
-No Unicode mapping for CID+122 (122) in font UAXQOI+Calibri
+text = text.replaceAll("[\\u200B\\uFEFF]", "");
+text = text.replaceAll(" +", " ");
+text = text.replaceAll("[\\r\\n]+", "\n");
