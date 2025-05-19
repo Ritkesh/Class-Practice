@@ -1,1 +1,1 @@
-pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(.+)");
+Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(.+?)(?=\\s{2,}|\\n|$)");
