@@ -1,2 +1,9 @@
-Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\S+)")
-
+ Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\S+)");
+                Matcher matcher = pattern.matcher(text);
+                while (matcher.find()) {
+                    String value = matcher.group(1).trim().replaceAll("\\s+", " ");
+                    labelExisted.put(label,value);
+                    log.info("Matched patient name: {}", value);
+                    addToMetadataList(metadata, key, value, page);
+                    break;
+                }
