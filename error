@@ -1,1 +1,1 @@
-pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+No Unicode mapping for CID+122 (122) in font UAXQOI+Calibri
