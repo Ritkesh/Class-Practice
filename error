@@ -1,20 +1,2 @@
-Pattern pattern;
-
-if (labelExisted.containsKey(label)) {
-    pattern = Pattern.compile("(?i)" + Pattern.quote(labelExisted.get(label)) + "\\s*[:\\-]?\\s*(.+?)(?=\\s+[A-Z][a-zA-Z]+\\s*[:\\-]|\\n|$)");
-    Matcher matcher = pattern.matcher(text);
-    if (matcher.find()) {
-        String value = matcher.group(1).trim();
-        log.info("Matched DOB: {}", value);
-        addToMetadataList(metadata, key, value, page);
-    }
-} else {
-    pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(.+?)(?=\\s+[A-Z][a-zA-Z]+\\s*[:\\-]|\\n|$)");
-    Matcher matcher = pattern.matcher(text);
-    if (matcher.find()) {
-        String value = matcher.group(1).trim();
-        labelExisted.put(label, value);
-        log.info("Matched DOB: {}", value);
-        addToMetadataList(metadata, key, value, page);
-    }
-}
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman run -p 9040:9040  18c3afd6be56
+Error: preparing container 71d7fddcd668a31e6dc38d4c71f3cb2f9be7699dd1ff63b76b4824e8cbdeaa1d for attach: something went wrong with the request: "proxy already running\n"
