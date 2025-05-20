@@ -1,2 +1,36 @@
-ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman run -p 9040:9040  18c3afd6be56
-Error: preparing container 7da07f901ec2e70609b4a8ad6e406333d244053ff9538cf5d646e626636fbf15 for attach: crun: executable file `java` not found in $PATH: No such file or directory: OCI runtime attempted to invoke a command that was not found
+
+FROM dmsrepo.optum.com/dms/ocrmypdf:1.0 AS base
+
+ENV LANG=C.UTF-8
+ENV TZ=UTC
+
+RUN apk add --no-cache \
+    openjdk17 \
+    bash
+#
+# RUN bash --version
+ RUN java --version
+# # Install uv if not installed
+# COPY --from=ghcr.io/astral-sh/uv:0.5.5 /uv /uvx /bin/
+# # Create the virtual environment
+# RUN uv venv --system-site-packages .venv
+#
+# # Install pip manually inside the virtualenv
+# RUN uv pip install --upgrade pip && \
+#     uv pip install ocrmypdf
+
+WORKDIR /app
+
+# # Copy the application JAR file to the container
+COPY target/pdf-process-0.0.1-SNAPSHOT.jar app.jar
+
+# # Copy the application-docker.properties file to the container
+COPY src/main/resources/application-docker.properties application.properties
+
+# # Expose the port the application runs on
+EXPOSE 9040
+
+# Run the application
+# ENTRYPOINT ["/app/.venv/bin/ocrmypdf"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# podman build -f Dockerfile --tag=docker.optum.com/dms/pdf-processing:1.0 .
