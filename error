@@ -1,2 +1,2 @@
 ritkesh_singh@optum.com@LAMU0M969DHQPP6 Ocrmypdf % podman run -p 9040:9040  18c3afd6be56
-Error: preparing container 71d7fddcd668a31e6dc38d4c71f3cb2f9be7699dd1ff63b76b4824e8cbdeaa1d for attach: something went wrong with the request: "proxy already running\n"
+Error: preparing container 7da07f901ec2e70609b4a8ad6e406333d244053ff9538cf5d646e626636fbf15 for attach: crun: executable file `java` not found in $PATH: No such file or directory: OCI runtime attempted to invoke a command that was not found
