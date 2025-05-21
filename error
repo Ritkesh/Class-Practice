@@ -1,59 +1,9 @@
-    private static void extractText(String text, String value, Map<String, List<PdfMetaData>> metadata, int page) {
-        Pattern pattern = Pattern.compile("(?i)"+Pattern.quote(value)+"\\s*[:\\-]?\\s*([A-Z0-9'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            addToMetadataList(metadata, value, page);
-        }
+private static void extractText(String text, String value, Map<String, List<PdfMetaData>> metadata, int page) {
+    Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(value) + "\\s*[:\\-]?\\s*([A-Z0-9'\\-\\. ]+?)(?=\\s{2,}|\\n|$)");
+    Matcher matcher = pattern.matcher(text);
+    while (matcher.find()) {
+        String extracted = matcher.group(1).trim();
+        System.out.println("Extracted: " + extracted); // Optional debug
+        addToMetadataList(metadata, extracted, page);
     }
-value is Robin E Hood
-
-
-and text is
-
-Patient Name: Robin E Hood Date of Birth: 09/11/2001 Sex: F Beneficiary ID: [1\VK1VR1UP90] Encounter Date: 12/13/2022
-Social History
-Type, Description, Quantity, Date Captured, Comments
-e Alcohol Use Details, Unknown, Dec-13-2022
-¢ Caffeine Use Details, Unknown, Dec-13-2022
-¢ Tobacco Use Status, No Information, Dec-13-2022
-e Smoking Status, Never smoker, Dec-13-2022
-e Birth Sex, Female
-Family History
-Family Member, Type, Diagnosis, Age At Onset
-e¢ No Information
-Advance Directives
-Directive, Yes/No, Effective Date, File Name
-e No Information
-Problems
-Condition, Type, Effect Dates (start-stop), Clinical Status, Comments
-¢ Melanocytic nevi of trunk (ICD-10 D22.5), ~
-e History of skin cancer (ICD-10 285.828), Diagnosis interpretation (observable entity)
-e History of melanoma (ICD-10 285.820), Diagnosis interpretation (observable entity)
-e AK (actinic keratosis) (ICD-10 L57.0), Diagnosis interpretation (observable entity)
-e SK (seborrheic keratosis) (ICD-10 L82.1), Diagnosis interpretation (observable entity)
-e Inflamed seborrheic keratosis (ICD-10 L82.0), Diagnosis interpretation (observable entity)
-Medications Administered
-Medication, Instructions, Dosage, Effective Dates (start-stop), Status, Comments
-e No Information
-Health Concerns
-Observation, Date
-e¢ No Information
-Concern, Status, Date
-e No Information
-Goals
-Health Concern, Goal, Type, Priority, Status, Date
-e No Information
-Medical Equipment
-Description, Device, Universal Device Identifier, Effective Dates (start-stop), Device Status, Implantable Device Status
-e No Information
-Assessments
-Type, Assessment, Date
-e assessment, Melanocytic nevi of trunk, Dec-13-2022
-e assessment, History of skin cancer, Dec-13-2022
-e assessment, History of melanoma, Dec-13-2022
-e assessment, AK (actinic keratosis), Dec-13-2022
-e assessment, SK (seborrheic keratosis), Dec-13-2022
-e assessment, Inflamed seborrheic keratosis, Dec-13-2022
-Legal Authenticator: Electronically signed by DarleneJ Kwee, MD at 12/15/2022 21:57:47, EST Provider NPI: 1891876496
-Page 2 of 3
-but still not matching
+}
