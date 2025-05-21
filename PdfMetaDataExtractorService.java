@@ -1,5 +1,6 @@
 package com.optum.dms.pdfprocess.service;
 
+import com.optum.dms.pdfprocess.entity.Claims;
 import com.optum.dms.pdfprocess.entity.PdfMetaData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -7,9 +8,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -45,9 +44,11 @@ public class PdfMetadataExtractorService {
 
     );
 
-    public Map<String, List<PdfMetaData>> getMetaData(File file) throws IOException {
+    public Map<String, List<PdfMetaData>> getMetaData(File file, Claims claims) throws IOException {
         PDDocument document = PDDocument.load(file);
         Map<String, List<PdfMetaData>> metadata = new HashMap<>();
+         Map<String,String>labelExisted = new HashMap<>();
+         Map<String,String> dateLabelExisted = new HashMap<>();
 
         Properties properties = new Properties();
 //        properties.load(new FileInputStream("src/main/resources/application.properties"));
@@ -73,11 +74,11 @@ public class PdfMetadataExtractorService {
             System.out.println("Processing page " + page);
             System.out.println("Page text: " + text);
 
-            extractFieldByLabels(text, firstnameLabels, "First Name", metadata, page);
-            extractFieldByLabels(text, middlenameLabels, "Middle Name", metadata, page);
-            extractFieldByLabels(text, lastnameLabels, "Last Name", metadata, page);
-            extractDateByLabels(text, dobLabels, "DOB", metadata, page);
-            extractDateByLabels(text, dobLabels1, "DOS", metadata, page);
+            extractFieldByLabels(text, firstnameLabels, "First Name", metadata, page,labelExisted);
+            extractFieldByLabels(text, middlenameLabels, "Middle Name", metadata, page,labelExisted);
+            extractFieldByLabels(text, lastnameLabels, "Last Name", metadata, page,labelExisted);
+            extractDateByLabels(text, dobLabels, "DOB", metadata, page,dateLabelExisted);
+            extractDateByLabels(text, dobLabels1, "DOS", metadata, page,dateLabelExisted);
 
             Matcher dateMatcher = datePattern.matcher(text);
             while (dateMatcher.find()) {
@@ -105,90 +106,35 @@ public class PdfMetadataExtractorService {
 
 
 
-//    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
-//        for (String label : labels) {
-////            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*(\\w+(?:\\s\\w+)*)(?=\\s*\\n|$)");
-////            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*((?:\\w+\\s(?!\\s))*\\w+)(?=\\s*\\n|$)");
-////            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s*\\n|$)");
-//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s*\\n|$)");
-//
-//            Matcher matcher = pattern.matcher(text);
-//            while (matcher.find()) {
-//                String value = matcher.group(1).trim();
-//                log.info("Matched value: {}", value);  // Add logging to see matched values
-//                addToMetadataList(metadata, key, value, page);
-//            }
-//        }
-//    }
+    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page,Map<String,String>labelExisted) {
 
-
-
-
-//    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
-//        for (String label : labels) {
-//            if (label.equalsIgnoreCase("Patient Name")) {
-//                // Custom regex to handle common variations and dynamic trailing text without the length restriction
-//                Pattern pattern = Pattern.compile("(?i)Patient Name\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
-//                Matcher matcher = pattern.matcher(text);
-//                while (matcher.find()) {
-//                    String value = matcher.group(1).trim().replaceAll("\\s+", " ");
-//                    log.info("Matched patient name: {}", value);
-//                    addToMetadataList(metadata, key, value, page);
-//                }
-//                continue; // Skip default logic for this label
-//            }
-//
-//            // Default extraction for other labels
-//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s{2,}|\\n|$)");
-//            Matcher matcher = pattern.matcher(text);
-//            while (matcher.find()) {
-//                String value = matcher.group(1).trim();
-//                log.info("Matched value for {}: {}", key, value);
-//                addToMetadataList(metadata, key, value, page);
-//            }
-//        }
-//    }
-
-
-    private static void extractFieldByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
         for (String label : labels) {
-//            if (label.equalsIgnoreCase("Patient Name")) {
-                // Custom regex to handle common variations and dynamic trailing text without the length restriction
-                Pattern pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+            Pattern pattern =Pattern.compile("");
+            if(labelExisted.containsKey(label)){
+                pattern = Pattern.compile("(?i)" + Pattern.quote(labelExisted.get(label)) + "\\s*[:\\-]?\\s*([A-Z'\\-\\.]+(?: [A-Z'\\-\\.]+)*)");
                 Matcher matcher = pattern.matcher(text);
                 while (matcher.find()) {
-                    String value = matcher.group(1).trim().replaceAll("\\s+", " ");
-                    log.info("Matched patient name: {}", value);
+                    String value = labelExisted.get(label);
+                    log.info("Matched DOB: {}", value);
                     addToMetadataList(metadata, key, value, page);
+                    break;
                 }
-//                continue; // Skip default logic for this label
-//            }
 
-            // Default extraction for other labels
-//            Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*([\\w\\s]+?)(?=\\s{2,}|\\n|$)");
-//            Matcher matcher = pattern.matcher(text);
-//            while (matcher.find()) {
-//                String value = matcher.group(1).trim();
-//                log.info("Matched value for {}: {}", key, value);
-//                addToMetadataList(metadata, key, value, page);
-//            }
-       }
+            } else {
+                 pattern = Pattern.compile("(?i)"+Pattern.quote(label)+"\\s*[:\\-]?\\s*([A-Z0-9'\\-\\. ]+)(?=\\s{2,}|\\n|$)");
+                Matcher matcher = pattern.matcher(text);
+                 while (matcher.find()) {
+                    String value = matcher.group(1).trim().replaceAll("\\s+", " ");
+                    labelExisted.put(label,value);
+                    log.info("Matched DOB: {}", value);
+                    addToMetadataList(metadata, key, value, page);
+                    break;
+                }
+            }
+        }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page) {
+    private static void extractDateByLabels(String text, List<String> labels, String key, Map<String, List<PdfMetaData>> metadata, int page,Map<String,String>dateLabelExisted) {
         System.out.println("Extracting dates from page " + page);
         System.out.println("Page text: " + text);
 
@@ -199,29 +145,50 @@ public class PdfMetadataExtractorService {
 //                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"
 //                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}"
 //                    + "|[A-Za-z]{3,9}\\s\\d{1,2}(st|nd|rd|th)?,\\s\\d{4})"
-//                    + "(?=\\s|$)";
-            String datePattern = "(?i)" + Pattern.quote(label) + "\\s*[:\\-]?\\s*"
-                    + "((?:\\d{1,2}[\\/\\-\\.]){2}\\d{2,4}"
-                    + "|\\d{4}[\\/\\-]\\d{1,2}[\\/\\-]\\d{1,2}"
-                    + "|[A-Za-z]{3,9}\\s\\d{1,2},\\s\\d{4}"
-                    + "|\\d{1,2}\\s+[A-Za-z]{3,9}\\s+\\d{4}"
-                    + "|[A-Za-z]{3,9}\\s\\d{1,2}(st|nd|rd|th)?,\\s\\d{4})"
-                    + "(?=\\s|$|\\s{1,})";
+//                    + "(?=\\s|$|\\s{1,})";
+//
+//            Pattern pattern = Pattern.compile(datePattern);
+//            Matcher matcher = pattern.matcher(text);
+//
+//            while (matcher.find()) {
+//                String rawDate = matcher.group(1).trim();
+//                System.out.println("Found raw date: " + rawDate);
+//                String parsedDate = normalizeDate(rawDate);
+//                if (parsedDate != null) {
+//                    addToMetadataList(metadata, key, parsedDate, page);
+//                } else {
+//                    System.out.println("Failed to parse date: " + rawDate);
+//                }
+//            }
 
-            Pattern pattern = Pattern.compile(datePattern);
-            Matcher matcher = pattern.matcher(text);
 
-            while (matcher.find()) {
-                String rawDate = matcher.group(1).trim();
-                System.out.println("Found raw date: " + rawDate);
-                String parsedDate = normalizeDate(rawDate);
-                if (parsedDate != null) {
-                    addToMetadataList(metadata, key, parsedDate, page);
-                } else {
-                    System.out.println("Failed to parse date: " + rawDate);
+            Pattern pattern = Pattern.compile("");
+
+            if (dateLabelExisted.containsKey(label)) {
+                pattern = Pattern.compile("(?i)" + Pattern.quote(dateLabelExisted.get(label)) + "\\s*[:\\-]?\\s*(.+?)(?=\\s+[A-Z][a-zA-Z]+\\s*[:\\-]|\\n|$)");
+                Matcher matcher = pattern.matcher(text);
+                if (matcher.find()) {
+                    String value = dateLabelExisted.get(label);
+                    log.info("Matched DOB: {}", value);
+                    addToMetadataList(metadata, key, value, page);
+                }
+            } else {
+                pattern = Pattern.compile("(?i)" + "\\b"+Pattern.quote(label) +"\\b"+ "\\s*[:\\-]?\\s*(.+?)(?=\\s+[A-Z][a-zA-Z]+\\s*[:\\-]|\\n|$)");
+                Matcher matcher = pattern.matcher(text);
+                if (matcher.find()) {
+                    String value = matcher.group(1).trim();
+                    dateLabelExisted.put(label, value);
+                    log.info("Matched DOB: {}", value);
+                    addToMetadataList(metadata, key, value, page);
                 }
             }
+
         }
+
+
+
+
+
     }
 
     private static void addToMetadataList(Map<String, List<PdfMetaData>> metadata, String key, String value, int page) {
@@ -273,4 +240,11 @@ public class PdfMetadataExtractorService {
 
         return Pattern.compile("(?i)(" + labelPattern + ")[\\s:;\\-]*([A-Za-z0-9 ,./-]{6,})");
     }
+    
+    // new method implementation getting value from claims
+    
+    
+    
+    
+    
 }
