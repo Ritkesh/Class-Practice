@@ -1,162 +1,69 @@
 package com.optum.dms.pdfprocess.service;
 
-import com.optum.dms.pdfprocess.entity.Claims;
-import com.optum.dms.pdfprocess.entity.PdfMetaData;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
+import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msfscc.FileAttributes;
+import com.hierynomus.mssmb2.SMB2CreateDisposition;
+import com.hierynomus.mssmb2.SMB2CreateOptions;
+import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.Session;
+import com.hierynomus.smbj.share.DiskShare;
+import com.hierynomus.smbj.share.File;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-@Slf4j
+import java.io.*;
+import java.util.Base64;
+import java.util.EnumSet;
 
 @Service
-public class PdfMetadataExtractorService {
 
-    public Map<String, List<PdfMetaData>> getMetaData(File file, Claims claims) throws IOException {
-        PDDocument document = PDDocument.load(file);
-        PDFTextStripper stripper = new PDFTextStripper();
-        int totalPages = document.getNumberOfPages();
-        Map<String, List<PdfMetaData>> metadata = new HashMap<>();
+public class OcrPdfService {
+    @Value("${smb.userName}")
+    private String userName;
+    @Value("${smb.password}")
+    private String password;
+    public java.io.File getTestFile(String fileName) throws Exception {
+        SMBClient client = new SMBClient();
 
-        for (int page = 1; page <= totalPages; page++) {
-            stripper.setStartPage(page);
-            stripper.setEndPage(page);
-            String text = stripper.getText(document);
-            System.out.println("Processing page " + page);
-            System.out.println("Page text: " + text);
-            extractText(text,claims.getPatient().getFirstname(),metadata,page);
-            extractText(text,claims.getPatient().getLastname(),metadata,page);
-            extractText(text,claims.getPatient().getDob(),metadata,page);
-            extractText(text,claims.getPatient().getDos(),metadata,page);
-            findDateByFormats(text,claims.getPatient().getDob(),metadata,page);
+        java.io.File tempfile = null;
 
+        try (Connection connection = client.connect("wn000129907")) {
+            AuthenticationContext authContext = new AuthenticationContext(userName, new String(Base64.getDecoder().decode(password)).toCharArray(), null);
+            Session session = connection.authenticate(authContext);
 
-        }
+            try (DiskShare share = (DiskShare) session.connectShare("DMS-TEAM")) {
+                String filePath = "ocrMyPDF/"+fileName;
 
-        document.close();
-        metadata.forEach((key, list) -> list.forEach(meta -> System.out.println(key + ": " + meta)));
+                if (share.fileExists(filePath)) {
+                     File file = share.openFile(
+                            filePath,
+                            EnumSet.of(AccessMask.GENERIC_READ),
+                            EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
+                            EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                            SMB2CreateDisposition.FILE_OPEN,
+                            EnumSet.noneOf(SMB2CreateOptions.class)
+                    );
+                    tempfile= java.io.File.createTempFile("test-",".pdf");
 
-        return metadata;
-    }
-
-
-
-    private static void extractText(String text, String value, Map<String, List<PdfMetaData>> metadata, int page) {
-        Pattern pattern = Pattern.compile("(?i)" + Pattern.quote(value));
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-
-            System.out.println("Extracted: " + value); // Optional debug
-            addToMetadataList(metadata,value, page);
-        }
-    }
-
-
-    private static void addToMetadataList(Map<String, List<PdfMetaData>> metadata, String value, int page) {
-        List<PdfMetaData> list = metadata.computeIfAbsent(value, v -> new ArrayList<>());
-
-        for (PdfMetaData meta : list) {
-            if (meta.getValue().equalsIgnoreCase(value)) {
-                meta.addPage(page);
-                return;
+                    try (InputStream is = file.getInputStream()) {
+                        // Read and process input stream here
+                        OutputStream out = new FileOutputStream(tempfile);
+                        byte[] buffer = new byte[8192];
+                        int bytesread;
+                        while ((bytesread = is.read(buffer))!=-1){
+                            out.write(buffer,0,bytesread);
+                        }
+                        System.out.println("File opened successfully!");
+                    }
+                } else {
+                    System.out.println("File not found: " + filePath);
+                }
             }
         }
-
-        list.add(new PdfMetaData(value, page));
-    }
-
-
-    // new method implementation getting value from claims
-
-    public static void findDateByFormats(String text, String inputDateStr, Map<String, List<PdfMetaData>> metadata, int page) {
-        LocalDate inputDate = parseToDate(inputDateStr);
-        if (inputDate == null) return;
-
-        List<String> formattedVariants = formatDateVariants(inputDate);
-
-        for (String variant : formattedVariants) {
-            if (text.toLowerCase().contains(variant.toLowerCase())) {
-                addToMetadataList(metadata, inputDateStr, page);
-                break;
-            }
-        }
-    }
-
-    // Step 1: Parse input string to LocalDate using multiple formats
-    private static LocalDate parseToDate(String dateStr) {
-        String[] formats = {
-                "yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
-                "MMM dd, yyyy", "dd MMM yyyy", "MMMM dd, yyyy",
-                "yyyy/MM/dd", "M/d/yyyy", "d MMM yyyy", "d MMMM yyyy","MMM d yyy"
-        };
-
-        for (String fmt : formats) {
-            try {
-                return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(fmt, Locale.ENGLISH));
-            } catch (DateTimeParseException e) {
-                // Try next
-            }
-        }
-        return null;
-    }
-
-    // Step 2: Generate all common format variations of a date
-    private static List<String> formatDateVariants(LocalDate date) {
-        String[] outputFormats = {
-                "yyyy-MM-dd", "MM/dd/yyyy", "dd/MM/yyyy", "dd-MM-yyyy",
-                "MMM dd, yyyy", "dd MMM yyyy", "MMMM dd, yyyy",
-                "yyyy/MM/dd", "M/d/yyyy", "d MMM yyyy", "d MMMM yyyy"
-        };
-
-        List<String> variants = new ArrayList<>();
-        for (String fmt : outputFormats) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(fmt, Locale.ENGLISH);
-            variants.add(date.format(formatter));
-        }
-        return variants;
+        return tempfile;
     }
 }
 
-
-
-
-package com.optum.dms.pdfprocess.entity;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class PdfMetaData {
-    private String value;
-    private Set<Integer> page = new HashSet<>();
-    @Override
-    public String toString() {
-        return "{ value: \"" + value + "\", page: " + page + " }";
-    }
-    public void addPage(int page){
-        this.page.add(page);
-    }
-    public PdfMetaData(String value,int page){
-        this.value =value;
-        this.page.add(page);
-    }
-}
-but i am not satisfie with the way meta data is keeping. I want it sould store like
-firstName:Robin,page:[1,2,3,4]
