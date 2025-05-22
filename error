@@ -1,2 +1,3 @@
 Get-NetFirewallRule -DisplayName "*Docker*" | Format-Table Name, Enabled
 Get-NetFirewallRule -DisplayName "*Podman*" | Format-Table Name, Enabled
+New-NetFirewallRule -DisplayName "Allow SMB Outbound for Podman" -Direction Outbound -Protocol TCP -LocalPort Any -RemotePort 445 -Action Allow
