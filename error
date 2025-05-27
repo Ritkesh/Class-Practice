@@ -1,4 +1,4 @@
-wsl --status
+8wsl --status
 
 ls /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images
 sudo mount -t drvfs C: /mnt/c
@@ -21,3 +21,8 @@ podman-machine-default-root  ssh://root@127.0.0.1:59873/run/podman/podman.sock  
 
 podman system connection remove podman-machine-default
 podman system connection remove podman-machine-default-root
+
+
+Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.config\containers" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\containers" -ErrorAction SilentlyContinue
