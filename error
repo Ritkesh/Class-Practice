@@ -3,6 +3,10 @@
 ls /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images
 sudo mount -t drvfs C: /mnt/c
 podman run -v /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images:/data -p 9040:9040 18a01d479bc2
+PS C:\Users\mdas47> podman run -v /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images:/data -p 9040:9040 d8aaf0e0dd4b
+WARNING: image platform (linux/arm64/v8) does not match the expected platform (linux/amd64)
+Error: statfs /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images: no such file or directory
+
 podman machine rm -f default
 Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
 Remove-VM -Name "default" -Force
