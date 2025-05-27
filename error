@@ -1,4 +1,4 @@
-hi8wsl --status
+9hi8wsl --status
 
 ls /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images
 sudo mount -t drvfs C: /mnt/c
@@ -39,3 +39,5 @@ podman machine start
 
 
 podman run -v /data:/data -p 9040:9040 your-image-id
+
+wmic cpu get NumberOfLogicalProcessors
