@@ -1,12 +1,14 @@
-private void logProcessOutputAsync(InputStream inputStream) {
-        new Thread(() -> {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    log.debug("[OCR] " + line);
-                }
-            } catch (IOException e) {
-                log.error("Error reading OCR process output", e);
-            }
-        }).start();
+private void logProcessOutput(Process process) throws IOException {
+    try (
+        BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()))
+    ) {
+        String line;
+        while ((line = stdOut.readLine()) != null) {
+            log.info("[STDOUT] " + line);
+        }
+        while ((line = stdErr.readLine()) != null) {
+            log.error("[STDERR] " + line);
+        }
     }
+}
