@@ -1,4 +1,4 @@
-Increase Heap for Your Application (Run Configuration)
+7Increase Heap for Your Application (Run Configuration)
 If you want to increase heap size for the Java app you're running, do this:
 
 Steps:
@@ -43,3 +43,11 @@ ocrmypdf is a native Python-based tool (not a Java process), so it's outside the
 
 You're calling ocrmypdf via Java (e.g., ProcessBuilder)
 The actual OCR logic runs outside JVM, so increasing heap has no direct impact
+
+
+
+To monitor cpu usage 
+sudo apt install htop   # Debian/Ubuntu
+brew install htop # for mac
+htop
+
