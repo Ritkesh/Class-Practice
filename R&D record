@@ -1,1 +1,19 @@
 
+ChatGPT
+
+ Increase Heap for Your Application (Run Configuration)
+If you want to increase heap size for the Java app you're running, do this:
+
+Steps:
+Open Run > Edit Configurations.
+
+Select your run configuration on the left.
+
+In the "VM options" field, add:
+
+-Xms512m -Xmx4g
+-Xms = initial heap size (e.g., 512 MB)
+
+-Xmx = max heap size (e.g., 4 GB)
+
+Example: Set to start at 512MB and max at 4GB
