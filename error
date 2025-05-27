@@ -17,3 +17,7 @@ PS C:\users\mdas47> podman system connection list
 Name                         URI                                                          Identity                                                        Default     ReadWrite
 podman-machine-default       ssh://core@127.0.0.1:59873/run/user/1000/podman/podman.sock  C:\Users\mdas47\.local\share\containers\podman\machine\machine  true        true
 podman-machine-default-root  ssh://root@127.0.0.1:59873/run/podman/podman.sock            C:\Users\mdas47\.local\share\containers\podman\machine\machine  false       true
+
+
+podman system connection remove podman-machine-default
+podman system connection remove podman-machine-default-root
