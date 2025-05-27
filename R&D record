@@ -38,3 +38,8 @@ http://localhost:8080/actuator/metrics/jvm.memory.max?tag=area:heap
 
 
 ocrmypdf is a native Python-based tool (not a Java process), so it's outside the JVM's memory management.
+
+
+
+You're calling ocrmypdf via Java (e.g., ProcessBuilder)
+The actual OCR logic runs outside JVM, so increasing heap has no direct impact
