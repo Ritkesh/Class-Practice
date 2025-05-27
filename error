@@ -30,3 +30,7 @@ podman system connection remove podman-machine-default-root
 Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$env:USERPROFILE\.config\containers" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\containers" -ErrorAction SilentlyContinue
+
+podman machine stop
+podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
+podman machine start
