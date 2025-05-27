@@ -5,3 +5,4 @@ sudo mount -t drvfs C: /mnt/c
 podman run -v /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images:/data -p 9040:9040 18a01d479bc2
 podman machine rm -f default
 Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
+Remove-VM -Name "default" -Force
