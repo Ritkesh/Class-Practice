@@ -6,3 +6,10 @@ podman run -v /mnt/c/Users/mdas47/Downloads/OCRmyPDF_images:/data -p 9040:9040 1
 podman machine rm -f default
 Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
 Remove-VM -Name "default" -Force
+
+
+
+
+
+Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM
+Error: unable to connect to Podman socket: failed to connect: dial tcp 127.0.0.1:59873: connectex: No connection could be made because the target machine actively refused it.
