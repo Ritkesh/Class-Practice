@@ -31,3 +31,10 @@ http://localhost:8080/actuator/metrics
 http://localhost:8080/actuator/metrics/jvm.memory.max
 
 http://localhost:8080/actuator/metrics/jvm.memory.max?tag=area:heap
+
+
+
+
+
+
+ocrmypdf is a native Python-based tool (not a Java process), so it's outside the JVM's memory management.
