@@ -1,7 +1,4 @@
-
-ChatGPT
-
- Increase Heap for Your Application (Run Configuration)
+Increase Heap for Your Application (Run Configuration)
 If you want to increase heap size for the Java app you're running, do this:
 
 Steps:
@@ -17,3 +14,20 @@ In the "VM options" field, add:
 -Xmx = max heap size (e.g., 4 GB)
 
 Example: Set to start at 512MB and max at 4GB
+
+
+To check jvm memory and meroy used 
+first add the below details to application.properties
+management.endpoints.web.exposure.include=health,info,metrics
+management.endpoint.metrics.enabled=true
+
+add dependency of actuator in pom.xml
+run mvn clean install
+after that run the below mentioned endpoints
+
+
+http://localhost:8080/actuator/metrics
+
+http://localhost:8080/actuator/metrics/jvm.memory.max
+
+http://localhost:8080/actuator/metrics/jvm.memory.max?tag=area:heap
