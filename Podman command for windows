@@ -11,3 +11,10 @@ for mounting we should use
 podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
 
 podman run -v /data:/data -p 9040:9040 d8aaf0e0dd4b
+
+
+to verify whether folder is mounted or not 
+PS C:\Users\mdas47> podman machine ssh
+[core@localhost ~]$ ls /data
+input.pdf  sample.jpg  some-folder
+[core@localhost ~]$ exit
