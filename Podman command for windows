@@ -1,0 +1,13 @@
+podman system connection remove podman-machine-default
+podman system connection remove podman-machine-default-root
+podman system connection remove podman-machine-default-root
+podman system connection remove podman-machine-default-root
+Remove-Item -Recurse -Force "$env:USERPROFILE\.config\containers" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\containers" -ErrorAction SilentlyContinue
+
+above commands are for deleting and removing the podman machine default , we have to open hyper v and delete the machine
+for mounting we should use
+
+podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
+
+podman run -v /data:/data -p 9040:9040 d8aaf0e0dd4b
