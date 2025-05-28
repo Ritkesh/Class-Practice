@@ -1,6 +1,271 @@
-java -Xmx3800m -Xms3800m -Xmn2g -Xss128k -XX:+UseParallelGC -XX:ParallelGCThreads=20
-java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:+UseParallelGC -XX:ParallelGCThreads=20 -XX:+UseParallelOldGC
-java -Xmx2506m -Xms2506m -Xmn1536m -Xss128k -XX:+UseParallelGC -XX:ParallelGCThreads=20 -XX:+UseParallelOldGC -XX:LargePageSizeInBytes=256m
-java -Xmx3550m -Xms3550m -Xmn2g -Xss128k -XX:ParallelGCThreads=20 -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=90 -XX:MaxTenuringThreshold=31 -XX:+AggressiveOpts
+package com.optum.dms.pdfprocess.service;
 
-will these help in reduicng the time
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.optum.dms.pdfprocess.entity.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.*;
+import java.net.URI;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+@Service
+public class OcrHandler {
+
+    @Value("${process.timeout.seconds}")
+    private long processTimeoutSeconds;
+
+    @Value("${application.user}")
+    private String user;
+
+    @Value("${pdf.url}")
+    private String pdfUrl;
+
+    @Value("${nuxeo.username}")
+    private String username;
+
+    @Value("${nuxeo.password}")
+    private String password;
+
+    @Value("${file.url}")
+    private String fileUrl;
+
+    @Value("${nuxeo.file.path}")
+    private String path;
+
+    @Autowired
+    PdfMetadataExtractorService pdfMetadataExtractorService;
+
+    @Autowired
+    TestPdfMetadataExtractorService testPdfMetadataExtractorService;
+
+    @Autowired
+    private OcrPdfService ocrPdfService;
+
+    public ResponseEntity<?> processPdfTest(String chartId, String forceOcr, Claims claims) {
+        log.info("Received request to process PDF: {}", chartId);
+
+        try {
+//            File sourceFile = new File("/data", chartId);
+            File sourceFile = ocrPdfService.getTestFile(chartId);
+
+            long start = System.currentTimeMillis();
+            if (!sourceFile.exists()) {
+                log.error("Source PDF not found: {}", sourceFile.getAbsolutePath());
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            log.info("Loading PDF from path: {}", sourceFile.getAbsolutePath());
+            byte[] pdfBytes = Files.readAllBytes(sourceFile.toPath());
+
+            File inputPdf = File.createTempFile("input", ".pdf");
+            try (FileOutputStream fos = new FileOutputStream(inputPdf)) {
+                fos.write(pdfBytes);
+            }
+
+            File outputPdf = File.createTempFile("output", "_linearized.pdf");
+            String ocrCommand = String.format(
+                    "ocrmypdf %s --rotate-pages --deskew --jobs %d \"%s\" \"%s\"",
+                    "true".equalsIgnoreCase(forceOcr) ? "--force-ocr" : "--skip-text",
+                    "true".equalsIgnoreCase(forceOcr) ? 12 : 4,
+                    inputPdf.getAbsolutePath(),
+                    outputPdf.getAbsolutePath()
+            );
+
+            log.info("Executing ocrmypdf command: {}", ocrCommand);
+            ProcessBuilder pb = new ProcessBuilder("bash", "-c", ocrCommand);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+            logProcessOutput(process);
+
+            if (!process.waitFor(processTimeoutSeconds, TimeUnit.SECONDS)) {
+                process.destroy();
+                log.error("ocrmypdf process timed out");
+                return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
+            }
+
+            if (process.exitValue() != 0) {
+                log.error("ocrmypdf failed with exit code {}", process.exitValue());
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+
+            log.info("ocrmypdf completed successfully. Proceeding with linearization.");
+
+            // Linearize the output PDF using QPDF
+            String linearizeCommand = String.format("qpdf --linearize --replace-input \"%s\"", outputPdf.getAbsolutePath());
+            Process linearizeProcess = new ProcessBuilder("bash", "-c", linearizeCommand).start();
+            logProcessOutput(linearizeProcess);
+
+            if (!linearizeProcess.waitFor(processTimeoutSeconds, TimeUnit.SECONDS)) {
+                linearizeProcess.destroy();
+                log.error("QPDF linearization timed out");
+                return new ResponseEntity<>(HttpStatus.REQUEST_TIMEOUT);
+            }
+
+            if (linearizeProcess.exitValue() != 0) {
+                log.error("QPDF linearization failed with exit code {}", linearizeProcess.exitValue());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            log.info("QPDF linearization completed successfully");
+
+            if (!isPdfLinearized(outputPdf)) {
+                log.warn("Warning: The output PDF is not linearized");
+            }
+
+            log.info("Uploading final PDF to Nuxeo");
+            uploadToNuxeoClient(outputPdf, path);
+
+            long end = System.currentTimeMillis();
+            log.info("Total OCR + Upload duration: {} ms", (end - start));
+        } catch (IOException | InterruptedException e) {
+            log.error("Error processing PDF: {}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public void uploadToNuxeoClient(File file, String path) {
+        try {
+            String batchId = getBatchId();
+            if (batchId != null) {
+                uploadFile(batchId, file);
+                checkUploadStatus(batchId);
+                createDocument(path, batchId, file);
+            }
+        } catch (Exception e) {
+            log.error("Error uploading to Nuxeo: {}", e.getMessage(), e);
+        }
+    }
+
+    private String getBatchId() throws JsonProcessingException {
+        String url = fileUrl + "/upload";
+        HttpEntity<String> entity = new HttpEntity<>(createAuthHeaders());
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode node = objectMapper.readTree(response.getBody());
+        String batchId = node.path("batchId").asText();
+        log.info("Batch ID received: {}", batchId);
+        return batchId;
+    }
+
+    public void uploadFile(String batchId, File file) throws IOException {
+        String url = fileUrl + "upload/" + batchId + "/0";
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.set("cookie", "SERVERID=nuxeodev_s1|aA+XR|aA+Wb");
+        headers.set("X-Upload-Type", "normal");
+        headers.set("X-File-Name", file.getName());
+
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
+        HttpEntity<byte[]> requestEntity = new HttpEntity<>(fileBytes, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+        log.info("Upload response: {}", response.getBody());
+    }
+
+    private void checkUploadStatus(String batchId) {
+        String url = fileUrl + "upload/" + batchId;
+        HttpEntity<String> entity = new HttpEntity<>(createAuthHeaders());
+        new RestTemplate().exchange(url, HttpMethod.GET, entity, String.class);
+    }
+
+    private void createDocument(String path, String batchId, File file) {
+        String url = fileUrl + "path/" + path;
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NXproperties", "*");
+        headers.set("X-NXRepository", "default");
+
+        FileContent content = new FileContent(batchId, "0");
+        FileProperties props = new FileProperties(file.getName(), content);
+        Document doc = new Document("document", file.getName(), "File", props);
+
+        try {
+            String body = new ObjectMapper().writeValueAsString(doc);
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.POST, entity, String.class);
+            log.info("Create document response: {}", response.getBody());
+        } catch (JsonProcessingException e) {
+            log.error("Error creating document: {}", e.getMessage());
+        }
+    }
+
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Basic " + encodeCredentials(username, password));
+        headers.set("X-Upload-Type", "normal");
+        return headers;
+    }
+
+    private String encodeCredentials(String username, String password) {
+        return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+    }
+
+    public File getmmrFile(String chartId, String user) throws IOException {
+        String url = pdfUrl + chartId + "&user=" + user;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_OCTET_STREAM));
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<Resource> response = new RestTemplate().exchange(URI.create(url), HttpMethod.GET, entity, Resource.class);
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            File tempFile = File.createTempFile("temp", ".pdf");
+            try (InputStream in = response.getBody().getInputStream(); FileOutputStream out = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+            return tempFile;
+        }
+        throw new RuntimeException("Failed to create temp file from API");
+    }
+
+    public boolean isPdfLinearized(File pdfFile) {
+        String command = String.format("qpdf --check \"%s\"", pdfFile.getAbsolutePath());
+        try {
+            Process process = new ProcessBuilder("bash", "-c", command).start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    log.info("[qpdf] {}", line);
+                    if (line.toLowerCase().contains("file is linearized")) return true;
+                }
+            }
+            if (process.waitFor() != 0) log.warn("qpdf exited with non-zero status");
+        } catch (IOException | InterruptedException e) {
+            log.error("Error checking PDF linearization: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    private void logProcessOutput(Process process) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.info(line);
+            }
+        }
+    }
+}
