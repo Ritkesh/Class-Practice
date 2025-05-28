@@ -1,7 +1,8 @@
 podman system connection remove podman-machine-default
 podman system connection remove podman-machine-default-root
-podman system connection remove podman-machine-default-root
-podman system connection remove podman-machine-default-root
+podman machine rm -f default
+
+Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$env:USERPROFILE\.config\containers" -ErrorAction SilentlyContinue
 Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\containers" -ErrorAction SilentlyContinue
 
