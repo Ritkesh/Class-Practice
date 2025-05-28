@@ -1,1 +1,3 @@
-
+PS C:\Users\mdas47> podman machine start
+Starting machine "podman-machine-default"
+Error: could not start api proxy since expected pipe is not available: podman-machine-default
