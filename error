@@ -1,9 +1,1 @@
-private String tryExtractText(File pdfFile) {
-    try (PDDocument document = PDDocument.load(pdfFile)) {
-        PDFTextStripper stripper = new PDFTextStripper();
-        return stripper.getText(document);
-    } catch (IOException e) {
-        log.error("Error extracting text for check", e);
-        return null;
-    }
-}
+
