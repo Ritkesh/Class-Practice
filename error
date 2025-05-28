@@ -1,22 +1,9 @@
-if ("true".equalsIgnoreCase(forceOcr)) {
-    // Force OCR all pages
-    ocrOptions = "--force-ocr";
-} else if (imagePages.isEmpty()) {
-    // Try extracting some text as a test
-    String extractedText = tryExtractText(inputPdf);
-    if (extractedText == null || extractedText.trim().isEmpty()) {
-        // No text detected, force OCR anyway
-        ocrOptions = "--force-ocr";
-        log.info("No image pages and no extractable text, forcing OCR");
-    } else {
-        ocrOptions = "--skip-text";
-        log.info("No image pages but text found, skipping OCR");
+private String tryExtractText(File pdfFile) {
+    try (PDDocument document = PDDocument.load(pdfFile)) {
+        PDFTextStripper stripper = new PDFTextStripper();
+        return stripper.getText(document);
+    } catch (IOException e) {
+        log.error("Error extracting text for check", e);
+        return null;
     }
-} else {
-    // OCR only image pages
-    String pagesList = imagePages.stream()
-        .sorted()
-        .map(String::valueOf)
-        .collect(Collectors.joining(","));
-    ocrOptions = String.format("--force-ocr --pages %s", pagesList);
 }
