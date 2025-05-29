@@ -1,8 +1,1 @@
-PS C:\users\mdas47> ntrights +r SeServiceLogonRight -u LHTU05CG14629WJ\mdas47
-ntrights : The term 'ntrights' is not recognized as the name of a cmdlet, function, script file, or operable program.
-Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
-At line:1 char:1
-+ ntrights +r SeServiceLogonRight -u LHTU05CG14629WJ\mdas47
-+ ~~~~~~~~
-    + CategoryInfo          : ObjectNotFound: (ntrights:String) [], CommandNotFoundException
-    + FullyQualifiedErrorId : CommandNotFoundException
+podman machine init --now --remote --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
