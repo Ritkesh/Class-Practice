@@ -1,3 +1,31 @@
-PS C:\Users\mdas47> podman machine start
-Starting machine "podman-machine-default"
-Error: could not start api proxy since expected pipe is not available: podman-machine-default
+    private void createDocument(String path, String batchId, File file) {
+        String url = fileUrl+"path/" + path;
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NXproperties","*");
+        headers.set("X-NXRepository","default");
+
+
+        FileContent fileContent = new FileContent(batchId,"0");
+        FileProperties fileProperties = new FileProperties(file.getName(), fileContent);
+        Document request = new Document("document", file.getName(), "File",fileProperties);
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            String requestBody = mapper.writeValueAsString(request);
+            System.out.println("new request body for create document:" + requestBody);
+            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            System.out.println("Upload response: " + response.getBody());
+            System.out.println("Status :" +response.getStatusCode());
+
+        } catch (JsonProcessingException e) {
+            log.error("error while creating document"+":"+e.getMessage());
+        }
+    }
