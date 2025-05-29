@@ -1,18 +1,3 @@
-PS C:\users\mdas47> podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
-
-Looking up Podman Machine image at quay.io/podman/machine-os:5.2 to create VM
-
-Getting image source signatures
-
-Copying blob 03dca83d65a7 done   |
-
-Copying config 44136fa355 done   |
-
-Writing manifest to image destination
-
-03dca83d65a73ab64e1a5587ebefd7b0b4d54d6f36cfe59eafb172565d139176
-
-Extracting compressed file: podman-machine-default-amd64.vhdx: done
-
-Error: failed to define system: Job failed with error code: 32768 (The operation failed.  The Hyper-V Virtual Machine Management service encountered an unexpected error: Logon failure: the user has not been granted the requested logon type at this computer. (0x80070569).)
- 
+# Grant 'Log on as a service' right to your user
+$account = "YOUR-COMPUTER-NAME\mdas47"
+ntrights +r SeServiceLogonRight -u $account
