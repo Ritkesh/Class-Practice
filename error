@@ -1,3 +1,8 @@
-cd $env:USERPROFILE\Desktop
-secedit /import /db secedit.sdb /cfg .\logonright.inf /areas USER_RIGHTS
-secedit /configure /db secedit.sdb /cfg .\logonright.inf /areas USER_RIGHTS
+Thursday, May 29, 2025 8:46:32 PM
+Error 1208: An extended error has occurred.
+	Error opening C:\Users\mdas47\Desktop\logonright.inf.
+Error 12: The access code is invalid.
+----Configuration engine was initialized with one or more errors.----
+ 
+ 
+----Un-initialize configuration engine...
