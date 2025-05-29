@@ -1,1 +1,10 @@
-.\ntrights.exe +r SeServiceLogonRight -u LHTU05CG14629WJ\mdas47
+$path = "$env:USERPROFILE\Desktop\logonright.inf"
+@"
+[Unicode]
+Unicode=yes
+[Version]
+signature="\$CHICAGO$"
+Revision=1
+[Privilege Rights]
+SeServiceLogonRight = LHTU05CG14629WJ\mdas47
+"@ | Out-File -FilePath $path -Encoding ASCII
