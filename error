@@ -1,116 +1,18 @@
-{
-    "entity-type": "document",
-    "repository": "default",
-    "uid": "4456b8cd-2ab7-42e6-9e31-ae00e67ad174",
-    "path": "/MPA/test/ED1.pdf.1748512789524",
-    "type": "File",
-    "state": "project",
-    "parentRef": "fa47976e-418b-4333-a4ea-fcb5b7639f55",
-    "isCheckedOut": true,
-    "isRecord": false,
-    "retainUntil": null,
-    "hasLegalHold": false,
-    "isUnderRetentionOrLegalHold": false,
-    "isVersion": false,
-    "isProxy": false,
-    "changeToken": "2-0",
-    "isTrashed": false,
-    "title": "For ED1.docx",
-    "lastModified": "2025-05-29T09:59:49.524Z",
-    "properties": {
-        "uid:uid": null,
-        "uid:major_version": 0,
-        "uid:minor_version": 0,
-        "thumb:thumbnail": {
-            "name": "ED1.png",
-            "mime-type": "image/png",
-            "encoding": null,
-            "digestAlgorithm": "MD5",
-            "digest": "74ebb23d06e8777d67fc756297c10d09",
-            "length": "441978",
-            "data": "https://nuxeodev.optum.com/nuxeo/nxfile/default/4456b8cd-2ab7-42e6-9e31-ae00e67ad174/thumb:thumbnail/ED1.png?changeToken=2-0",
-            "blobUrl": "https://nuxeodev.optum.com/nuxeo/nxfile/default/4456b8cd-2ab7-42e6-9e31-ae00e67ad174/thumb:thumbnail/ED1.png?changeToken=2-0"
-        },
-        "file:content": {
-            "name": "ED1.pdf",
-            "mime-type": "application/pdf",
-            "encoding": null,
-            "digestAlgorithm": "MD5",
-            "digest": "afadd1fe3c7e438bb7599db77683764b",
-            "length": "249645",
-            "data": "https://nuxeodev.optum.com/nuxeo/nxfile/default/4456b8cd-2ab7-42e6-9e31-ae00e67ad174/file:content/ED1.pdf?changeToken=2-0",
-            "blobUrl": "https://nuxeodev.optum.com/nuxeo/nxfile/default/4456b8cd-2ab7-42e6-9e31-ae00e67ad174/file:content/ED1.pdf?changeToken=2-0"
-        },
-        "common:icon-expanded": null,
-        "common:icon": "/icons/pdf.png",
-        "files:files": [],
-        "dc:description": "Created via a so cool and simple REST API",
-        "dc:language": null,
-        "dc:coverage": null,
-        "dc:valid": null,
-        "dc:creator": "dmsjadenx_nprd",
-        "dc:modified": "2025-05-29T09:59:49.524Z",
-        "dc:lastContributor": "dmsjadenx_nprd",
-        "dc:rights": null,
-        "dc:expired": null,
-        "dc:format": null,
-        "dc:created": "2025-05-29T09:59:49.524Z",
-        "dc:title": "For ED1.docx",
-        "dc:issued": null,
-        "dc:nature": null,
-        "dc:subjects": [],
-        "dc:contributors": [
-            "dmsjadenx_nprd"
-        ],
-        "dc:source": null,
-        "dc:publisher": null,
-        "relatedtext:relatedtextresources": [],
-        "nxtag:tags": []
-    },
-    "facets": [
-        "Versionable",
-        "NXTag",
-        "Publishable",
-        "Commentable",
-        "HasRelatedText",
-        "Thumbnail"
-    ],
-    "schemas": [
-        {
-            "name": "file_schema",
-            "prefix": "file_schema"
-        },
-        {
-            "name": "uid",
-            "prefix": "uid"
-        },
-        {
-            "name": "thumbnail",
-            "prefix": "thumb"
-        },
-        {
-            "name": "file",
-            "prefix": "file"
-        },
-        {
-            "name": "common",
-            "prefix": "common"
-        },
-        {
-            "name": "files",
-            "prefix": "files"
-        },
-        {
-            "name": "dublincore",
-            "prefix": "dc"
-        },
-        {
-            "name": "relatedtext",
-            "prefix": "relatedtext"
-        },
-        {
-            "name": "facetedTag",
-            "prefix": "nxtag"
-        }
-    ]
-}
+PS C:\users\mdas47> podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
+
+Looking up Podman Machine image at quay.io/podman/machine-os:5.2 to create VM
+
+Getting image source signatures
+
+Copying blob 03dca83d65a7 done   |
+
+Copying config 44136fa355 done   |
+
+Writing manifest to image destination
+
+03dca83d65a73ab64e1a5587ebefd7b0b4d54d6f36cfe59eafb172565d139176
+
+Extracting compressed file: podman-machine-default-amd64.vhdx: done
+
+Error: failed to define system: Job failed with error code: 32768 (The operation failed.  The Hyper-V Virtual Machine Management service encountered an unexpected error: Logon failure: the user has not been granted the requested logon type at this computer. (0x80070569).)
+ 
