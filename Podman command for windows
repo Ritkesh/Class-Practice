@@ -1,18 +1,22 @@
-PS C:\users\mdas47> podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
+podman system connection remove podman-machine-default
+podman system connection remove podman-machine-default-root
+podman machine rm -f default
 
-Looking up Podman Machine image at quay.io/podman/machine-os:5.2 to create VM
+Remove-Item -Recurse -Force "$env:USERPROFILE\.podman" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.config\containers" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$env:USERPROFILE\.local\share\containers" -ErrorAction SilentlyContinue
 
-Getting image source signatures
+above commands are for deleting and removing the podman machine default , we have to open hyper v and delete the machine
+for mounting we should use
 
-Copying blob 03dca83d65a7 done   |
+podman machine init --volume "C:\Users\mdas47\Downloads\OCRmyPDF_images:/data"
 
-Copying config 44136fa355 done   |
+podman run -v /data:/data -p 9040:9040 d8aaf0e0dd4b
 
-Writing manifest to image destination
 
-03dca83d65a73ab64e1a5587ebefd7b0b4d54d6f36cfe59eafb172565d139176
 
-Extracting compressed file: podman-machine-default-amd64.vhdx: done
-
-Error: failed to define system: Job failed with error code: 32768 (The operation failed.  The Hyper-V Virtual Machine Management service encountered an unexpected error: Logon failure: the user has not been granted the requested logon type at this computer. (0x80070569).)
- 
+to verify whether folder is mounted or not 
+PS C:\Users\mdas47> podman machine ssh
+[core@localhost ~]$ ls /data
+input.pdf  sample.jpg  some-folder
+[core@localhost ~]$ exit
