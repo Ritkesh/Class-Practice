@@ -1,7 +1,4 @@
-                    ocrCommand = String.format(
-                            "ocrmypdf --force-ocr --pdf-renderer -l eng --tesseract-config 'psm 1' --rotate-pages --deskew --jobs 12 \"%s\" \"%s\"",
-                            inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
-                    );
-
-
-giving error OCRmyPDF: error: argument --pdf-renderer: expected one argument
+ocrCommand = String.format(
+    "ocrmypdf --force-ocr --pdf-renderer hocr -l eng --tesseract-pagesegmode 1 --rotate-pages --deskew --jobs 12 \"%s\" \"%s\"",
+    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
+);
