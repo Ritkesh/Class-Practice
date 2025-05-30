@@ -1,8 +1,114 @@
-Thursday, May 29, 2025 8:46:32 PM
-Error 1208: An extended error has occurred.
-	Error opening C:\Users\mdas47\Desktop\logonright.inf.
-Error 12: The access code is invalid.
-----Configuration engine was initialized with one or more errors.----
- 
- 
-----Un-initialize configuration engine...
+DEBUG ocrmypdf - ocrmypdf 16.10.0
+2025-05-30T17:52:33.608+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['tesseract', '--version']
+2025-05-30T17:52:33.670+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Found tesseract 5.5.0
+2025-05-30T17:52:33.670+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['tesseract', '--version']
+2025-05-30T17:52:33.678+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['tesseract', '--version']
+2025-05-30T17:52:33.685+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['gs', '--version']
+2025-05-30T17:52:33.788+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Found gs 10.5.0
+2025-05-30T17:52:33.788+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['gs', '--version']
+2025-05-30T17:52:33.799+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['tesseract', '--list-langs']
+2025-05-30T17:52:33.809+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.tesseract - stdout/stderr = List of available languages in "/opt/homebrew/share/tessdata/" (3):
+2025-05-30T17:52:33.809+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : eng
+2025-05-30T17:52:33.809+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : osd
+2025-05-30T17:52:33.809+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : snum
+2025-05-30T17:52:33.809+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:33.810+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - pikepdf mmap enabled
+2025-05-30T17:52:33.810+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - os.symlink(/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/input4994647717774985677.pdf, /var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/origin)
+2025-05-30T17:52:33.834+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG root - Gathering info with 1 thread workers
+2025-05-30T17:52:33.834+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - pikepdf mmap enabled
+2025-05-30T17:52:33.842+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:33.842+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.builtin_plugins.tesseract_ocr - Using Tesseract OpenMP thread limit 3
+2025-05-30T17:52:33.846+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - pikepdf mmap enabled
+2025-05-30T17:52:33.846+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :    INFO ocrmypdf._pipeline -    1  page already has text! - rasterizing text and running OCR anyway
+2025-05-30T17:52:33.846+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess -    1  Running: ['gs', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dInterpolateControl=-1', '-sDEVICE=jpeggray', '-dFirstPage=1', '-dLastPage=1', '-r300.000000x300.000000', '-dPDFSTOPONERROR', '-o', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_rasterize_preview.jpg', '-sstdout=%stderr', '-dAutoRotatePages=/None', '-f', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/origin.pdf']
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs -    1  stderr = GPL Ghostscript 10.05.0 (2025-03-12)
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Copyright (C) 2025 Artifex Software, Inc.  All rights reserved.
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : This software is supplied under the GNU AGPLv3 and comes with NO WARRANTY:
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : see the file COPYING for details.
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Processing pages 1 through 1.
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Page 1
+2025-05-30T17:52:34.092+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:34.102+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._exec.ghostscript -    1  Rotating output by 0
+2025-05-30T17:52:34.121+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess -    1  Running: ['tesseract', '-l', 'osd', '--psm', '0', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_rasterize_preview.jpg', 'stdout']
+2025-05-30T17:52:34.523+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :    INFO ocrmypdf._pipeline -    1  page is facing ⇧, confidence 10.36 - no change
+2025-05-30T17:52:34.523+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline -    1  Page has vector content, using png16m
+2025-05-30T17:52:34.523+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline -    1  Rasterize with png16m, rotation 0
+2025-05-30T17:52:34.524+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess -    1  Running: ['gs', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dInterpolateControl=-1', '-sDEVICE=png16m', '-dFirstPage=1', '-dLastPage=1', '-r400.000000x400.000000', '-dPDFSTOPONERROR', '-o', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_rasterize.png', '-sstdout=%stderr', '-dAutoRotatePages=/None', '-f', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/origin.pdf']
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs -    1  stderr = GPL Ghostscript 10.05.0 (2025-03-12)
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Copyright (C) 2025 Artifex Software, Inc.  All rights reserved.
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : This software is supplied under the GNU AGPLv3 and comes with NO WARRANTY:
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : see the file COPYING for details.
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Processing pages 1 through 1.
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : Page 1
+2025-05-30T17:52:34.860+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:34.862+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IHDR' 16 13
+2025-05-30T17:52:34.862+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'sRGB' 41 1
+2025-05-30T17:52:34.862+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'pHYs' 54 9
+2025-05-30T17:52:34.862+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'tEXt' 75 32
+2025-05-30T17:52:34.862+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IDAT' 119 8192
+2025-05-30T17:52:35.086+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess -    1  Running: ['tesseract', '-l', 'eng', '--psm', '2', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_rasterize.png', 'stdout']
+2025-05-30T17:52:35.552+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._exec.tesseract -    1  Deskew angle: 0.000
+2025-05-30T17:52:35.553+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IHDR' 16 13
+2025-05-30T17:52:35.553+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'pHYs' 41 9
+2025-05-30T17:52:35.553+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IDAT' 62 65536
+2025-05-30T17:52:35.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IHDR' 16 13
+2025-05-30T17:52:35.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'pHYs' 41 9
+2025-05-30T17:52:35.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IDAT' 62 65536
+2025-05-30T17:52:35.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline -    1  resolution (399.9992, 399.9992)
+2025-05-30T17:52:36.001+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline -    1  convert
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IHDR' 16 13
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'pHYs' 41 9
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG PIL.PngImagePlugin -    1  STREAM b'IDAT' 62 65536
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  PIL format = PNG
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  imgformat = PNG
+2025-05-30T17:52:36.002+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  input dpi = 400 x 400
+2025-05-30T17:52:36.047+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  rotation = 0°
+2025-05-30T17:52:36.047+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  input colorspace = RGB
+2025-05-30T17:52:36.047+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  width x height = 3306px x 4678px
+2025-05-30T17:52:36.047+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG img2pdf -    1  read_images() embeds a PNG
+2025-05-30T17:52:36.049+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline -    1  convert done
+2025-05-30T17:52:36.052+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess -    1  Running: ['tesseract', '-l', 'eng', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_ocr.png', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/000001_ocr_hocr', 'hocr', 'txt']
+2025-05-30T17:52:36.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  pikepdf.Matrix(0.18, 0, 0, -0.18, 0, 842.04)
+2025-05-30T17:52:36.785+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.792+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.799+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.801+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.807+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.812+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.814+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.hocrtransform._hocr -    1  eng
+2025-05-30T17:52:36.828+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._graft -    1  Emplacement update
+2025-05-30T17:52:36.836+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._graft -    1  Text rotation: (text, autorotate, content) -> text misalignment = (0, 0, 0) -> 0
+2025-05-30T17:52:36.837+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._graft -    1  Grafting
+2025-05-30T17:52:36.841+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._graft -    1  Grafting with ctm pikepdf.Matrix(0.999866, 0, 0, 0.999952, 0, 0)
+2025-05-30T17:52:36.841+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._graft -    1  Page rotation: (content, auto) -> page = (0, 0) -> 0
+2025-05-30T17:52:36.842+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:36.843+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :    INFO ocrmypdf._pipelines.ocr - Postprocessing...
+2025-05-30T17:52:36.856+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - os.symlink(/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/graft_layers.pdf, /var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/fix_docinfo.pdf)
+2025-05-30T17:52:36.856+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['gs', '--version']
+2025-05-30T17:52:36.867+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['gs', '-dBATCH', '-dNOPAUSE', '-dSAFER', '-dCompatibilityLevel=1.6', '-sDEVICE=pdfwrite', '-dAutoRotatePages=/None', '-sColorConversionStrategy=LeaveColorUnchanged', '-dPDFSTOPONERROR', '-dAutoFilterColorImages=true', '-dAutoFilterGrayImages=true', '-dJPEGQ=95', '-dPDFA=2', '-dPDFACompatibilityPolicy=1', '-o', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/pdfa.pdf', '-sstdout=%stderr', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/pdfa.ps', '/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/fix_docinfo.pdf']
+2025-05-30T17:52:36.877+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - GPL Ghostscript 10.05.0 (2025-03-12)
+2025-05-30T17:52:36.877+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - Copyright (C) 2025 Artifex Software, Inc.  All rights reserved.
+2025-05-30T17:52:36.877+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - This software is supplied under the GNU AGPLv3 and comes with NO WARRANTY:
+2025-05-30T17:52:36.877+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - see the file COPYING for details.
+2025-05-30T17:52:36.900+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - Processing pages 1 through 1.
+2025-05-30T17:52:36.900+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess.gs - Page 1
+2025-05-30T17:52:37.122+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['tesseract', '--version']
+2025-05-30T17:52:37.135+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : WARNING ocrmypdf._metadata - Some input metadata could not be copied because it is not permitted in PDF/A. You may wish to examine the output PDF's XMP metadata.
+2025-05-30T17:52:37.136+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._metadata - The following metadata fields were not copied: {'{http://ns.adobe.com/xap/1.0/mm/}History', '{http://ns.adobe.com/pdfx/1.3/}AtalaInfoV1', '{http://ns.adobe.com/xap/1.0/mm/}InstanceID'}
+2025-05-30T17:52:37.139+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:37.145+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - xref 19: treating as an optimization candidate
+2025-05-30T17:52:37.456+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - XrefExt(xref=19, ext='.png')
+2025-05-30T17:52:37.456+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - Optimizable images: JPEGs: 0 PNGs: 1
+2025-05-30T17:52:37.456+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:37.456+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - xref 19: treating as an optimization candidate
+2025-05-30T17:52:37.457+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:37.457+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - xref 19: treating as an optimization candidate
+2025-05-30T17:52:37.457+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.optimize - Optimizable images: JBIG2 groups: 0
+2025-05-30T17:52:37.458+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    : 
+2025-05-30T17:52:37.459+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.helpers - os.symlink(/var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/optimize.opt.pdf, /var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/optimize.pdf)
+2025-05-30T17:52:37.459+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['jbig2', '--version']
+2025-05-30T17:52:37.470+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf.subprocess - Running: ['pngquant', '--version']
+2025-05-30T17:52:37.481+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :    INFO ocrmypdf._pipeline - Image optimization ratio: 1.00 savings: 0.0%
+2025-05-30T17:52:37.481+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :    INFO ocrmypdf._pipeline - Total file size ratio: 0.39 savings: -156.6%
+2025-05-30T17:52:37.481+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler    :   DEBUG ocrmypdf._pipeline - /var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/ocrmypdf.io.kbvot3w6/optimize.pdf -> /var/folders/ch/28y8lvjd4zd50_kxfcpn945w0000gp/T/output3589732272397178019_linearized.pdf
+2025-05-30T17:52:37.490+05:30  INFO 16319 --- [nio-8104-exec-2] c.o.dms.pdfprocess.service.OcrHandler   
