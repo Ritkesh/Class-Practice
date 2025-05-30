@@ -1,4 +1,5 @@
-ocrCommand = String.format(
-    "ocrmypdf --force-ocr --pdf-renderer hocr -l eng --tesseract-pagesegmode 1 --rotate-pages --deskew --jobs 12 \"%s\" \"%s\"",
-    inputPdf.getAbsolutePath(), outputPdf.getAbsolutePath()
-);
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % pdftotext output12735042184607355362_linearized.pdf extracted.txt
+I/O Error: Couldn't open file 'output12735042184607355362_linearized.pdf': No such file or directory.
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % pdftotext Users/ritkesh_singh@optum.com/Downloads/output12735042184607355362_linearized.pdf extracted.txt
+I/O Error: Couldn't open file 'Users/ritkesh_singh@optum.com/Downloads/output12735042184607355362_linearized.pdf': No such file or directory.
+ritkesh_singh@optum.com@LAMU0M969DHQPP6 ~ % 
